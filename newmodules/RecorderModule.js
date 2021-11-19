@@ -1,4 +1,4 @@
-import Module from "/newmodules/Module.js";
+import Module from "./newmodules/Module.js";
 
 export default class RecorderModule extends Module {
 	constructor(options) {
