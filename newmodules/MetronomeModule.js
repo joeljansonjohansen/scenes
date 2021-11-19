@@ -1,4 +1,4 @@
-import Module from "./newmodules/Module.js";
+import Module from "./Module.js";
 
 export default class MetronomeModule extends Module {
 	constructor(options) {
