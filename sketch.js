@@ -1,6 +1,6 @@
-import Module from "/newmodules/Module.js";
-import RecorderModule from "/newmodules/RecorderModule.js";
-import PlayerModule from "/newmodules/PlayerModule.js";
+import Module from "./newmodules/Module.js";
+import RecorderModule from "./newmodules/RecorderModule.js";
+import PlayerModule from "./newmodules/PlayerModule.js";
 import MetronomeModule from "./newmodules/MetronomeModule.js";
 
 let mic;
