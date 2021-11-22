@@ -1,32 +1,33 @@
 import Module from "./Module.js";
 
+/* 
+    The PlayerModule can play audio files and does so for a ceratain amount of time
+    that you define by setting length. If length is not set, then length is 0 until
+    the player gets a buffer - ??
+    */
+
 export default class PlayerModule extends Module {
 	constructor(options) {
 		super(options);
 		this.playbackRate = options.playbackRate ?? 1;
 		this.transposed = options.transpose ?? 0;
 		this.transposeBy = this.transposed;
+		this._transpositionChanges = [];
+		this._previousTransposition = this.transposed;
 	}
 
 	set transposeBy(interval) {
 		this.playbackRate = Tone.intervalToFrequencyRatio(interval);
 		this.transposed = interval;
-	}
-
-	get progress() {
-		if (!this._initialTime) {
-			return 0;
+		if (this._player) {
+			this._player.playbackRate = this.playbackRate;
 		}
-		let passedTime = Date.now() - this._initialTime;
-		return passedTime / this._lengthInMs;
 	}
 
 	prepareModule(options) {
 		//Function for any preparations that cannot be done in the setup but should be done before start to save valuable time at the starting point.
 		this._player = new Tone.Player({
 			loop: true,
-			fadeIn: 0.1,
-			fadeOut: 0.1,
 			url: options.recordingURL,
 			playbackRate: this.playbackRate,
 			onload: () => {
@@ -49,19 +50,58 @@ export default class PlayerModule extends Module {
 		return this;
 	}
 
-	// get rate() {
-	// 	this.playbackRate -= 0.00025;
-	// 	return this.playbackRate > 0.5 ? this.playbackRate : 0.5;
-	// }
+	addTranspositionChange(timing, interval) {
+		this._transpositionChanges.push({ timing: timing, interval: interval });
+	}
 
-	// update(passedTime) {
-	// 	super.update(passedTime);
-	// 	// if (this.progress >= 0.2) {
-	// 	// 	this._player.playbackRate = 0.5;
-	// 	// }
-	// 	// if (this._player && this._player.state == "started") {
-	// 	// 	//console.log(this.rate);
-	// 	// 	this._player.playbackRate = this.rate;
-	// 	// }
-	// }
+	update(passedTime) {
+		super.update(passedTime);
+		if (this._ended) {
+			return;
+		}
+		if (this._started) {
+			for (let change of this._transpositionChanges) {
+				if (this.progress >= change.timing) {
+					if (this.transposed != change.interval) {
+						this.transposeBy = change.interval;
+						console.log("changed interval");
+					} else {
+						if (this._previousTransposition != this.transposed) {
+							this._previousTransposition = this.transposed;
+							this._transpositionChanges.splice(
+								this._transpositionChanges.indexOf(change),
+								1
+							);
+						}
+					}
+				}
+
+				// Implementation of a portamentoversion
+				// if (this.progress >= change.timing) {
+				// 	if (this.transposed != change.interval) {
+				// 		let direction =
+				// 			change.interval - this._previousTransposition < 0 ? "down" : "up";
+				// 		let computedChange;
+				// 		if (direction == "up") {
+				// 			this.transposed += 0.05;
+				// 			computedChange = constrain(this.transposed, -48, change.interval);
+				// 		} else {
+				// 			this.transposed -= 0.05;
+				// 			computedChange = constrain(this.transposed, change.interval, 48);
+				// 		}
+				// 		console.log(round(computedChange * 100) / 100);
+				// 		this.transposeBy = round(computedChange * 100) / 100;
+				// 	} else {
+				// 		if (this._previousTransposition != this.transposed) {
+				// 			this._previousTransposition = this.transposed;
+				// 			this._transpositionChanges.splice(
+				// 				this._transpositionChanges.indexOf(change),
+				// 				1
+				// 			);
+				// 		}
+				// 	}
+				// }
+			}
+		}
+	}
 }

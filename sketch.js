@@ -1,11 +1,15 @@
 import Module from "./newmodules/Module.js";
+import Transport from "./newmodules/Transport.js";
 import RecorderModule from "./newmodules/RecorderModule.js";
 import PlayerModule from "./newmodules/PlayerModule.js";
+import GrainPlayerModule from "./newmodules/GrainPlayerModule.js";
 import MetronomeModule from "./newmodules/MetronomeModule.js";
 
 let mic;
 let modules = [];
 let startTime = Infinity;
+let currentBar = -1;
+let lengthOfBar = 0;
 
 function setup() {
 	createCanvas(400, 400);
@@ -14,7 +18,9 @@ function setup() {
 
 function draw() {
 	background(244);
-	let passedTime = Date.now() - startTime;
+	text(currentBar, 140, 140);
+	//let passedTime = Date.now() - startTime;
+	let passedTime = Tone.Transport.seconds * 1000;
 	let index = 1;
 	for (let module of modules) {
 		let x = 0;
@@ -25,6 +31,17 @@ function draw() {
 		module.draw(x, y, w, h);
 		index++;
 	}
+	//console.log("passedTime = ", passedTime / 1000);
+	//console.log("Tone.Transport.timeSignature = ", Tone.Transport.position);
+	//console.log(currentBar);
+	if (passedTime > lengthOfBar) {
+		lengthOfBar =
+			passedTime +
+			(60 / Tone.Transport.bpm.value) * Tone.Transport.timeSignature * 1000;
+		console.log(currentBar);
+		currentBar++;
+		//console.log("Tone.Transport.position = ", Tone.Transport.position);
+	}
 }
 
 function setupScenes() {
@@ -34,7 +51,7 @@ function setupScenes() {
 	let metro = new MetronomeModule({
 		start: 0,
 		bpm: 60,
-		count: 4,
+		count: 2,
 		onEnd: () => {
 			console.log("metro module finished");
 			modules.splice(modules.indexOf(metro), 1);
@@ -42,18 +59,20 @@ function setupScenes() {
 	});
 	modules.push(metro);
 
-	let playerModule = new PlayerModule({
-		start: metro.end + 11,
+	let playerModule = new GrainPlayerModule({
+		start: metro.end + 5,
 		length: 40,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModule), 1);
 		},
 	});
+	playerModule.addTranspositionChange(0.2, -7);
+	playerModule.addTranspositionChange(0.4, 0);
 	modules.push(playerModule);
 
-	let playerModulet = new PlayerModule({
-		start: metro.end + 11,
+	let playerModulet = new GrainPlayerModule({
+		start: metro.end + 5,
 		length: 40,
 		transpose: 3,
 		onEnd: () => {
@@ -61,22 +80,24 @@ function setupScenes() {
 			modules.splice(modules.indexOf(playerModulet), 1);
 		},
 	});
+	playerModulet.addTranspositionChange(0.2, -3);
+	playerModulet.addTranspositionChange(0.4, 3);
 	modules.push(playerModulet);
 
-	let playerModulee = new PlayerModule({
-		start: metro.end + 11,
-		length: 40,
-		transpose: 7,
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModulee), 1);
-		},
-	});
-	modules.push(playerModulee);
+	// let playerModulee = new GrainPlayerModule({
+	// 	start: metro.end + 5,
+	// 	length: 40,
+	// 	transpose: 7,
+	// 	onEnd: () => {
+	// 		console.log("module finished");
+	// 		modules.splice(modules.indexOf(playerModulee), 1);
+	// 	},
+	// });
+	// modules.push(playerModulee);
 
 	let recorderModule = new RecorderModule({
 		start: metro.length,
-		length: 10,
+		length: 4,
 		mic: mic,
 		onEnd: () => {
 			console.log("module finished");
@@ -155,23 +176,27 @@ function setupScenes() {
     */
 }
 
-document.getElementById("getMicrophoneAccess")?.addEventListener("click", async () => {
-	await Tone.start();
-	console.log("audio is ready");
-	mic = new Tone.UserMedia(-10);
-	mic
-		.open()
-		.then(() => {
-			console.log("got microphone access");
-		})
-		.catch((e) => {
-			// promise is rejected when the user doesn't have or allow mic access
-			console.log("mic not open");
-		});
-});
+document
+	.getElementById("getMicrophoneAccess")
+	?.addEventListener("click", async () => {
+		await Tone.start();
+		console.log("audio is ready");
+		mic = new Tone.UserMedia(-10);
+		mic
+			.open()
+			.then(() => {
+				console.log("got microphone access");
+			})
+			.catch((e) => {
+				// promise is rejected when the user doesn't have or allow mic access
+				console.log("mic not open");
+			});
+	});
 
 document.getElementById("startButton")?.addEventListener("click", () => {
 	setupScenes();
+	//let Transport = new Transport();
+	Tone.Transport.start();
 	startTime = Date.now();
 });
 

@@ -1,5 +1,11 @@
 import Module from "./Module.js";
 
+/* 
+    The MetronomeModule can be used as a timer or a metronome.
+    * If set to "timer", it shows a progress from 0-1 to guide a musician more freely.
+    * If set to "metro" (default) it uses the bpm and count to create as many counts wanted in the set bpm.
+    */
+
 export default class MetronomeModule extends Module {
 	constructor(options) {
 		//Calculate the length of the metro if we only get a bpm.
@@ -13,21 +19,24 @@ export default class MetronomeModule extends Module {
 		this.bpm = bpm;
 		this.mode = options.mode ?? "metro";
 		this.length = options.length ?? this._bpmLength ?? 0;
-
-		// this.length =
 	}
 
 	draw(x, y, w, h) {
-		if (this._ended) {
-			return;
-		}
-		if (this._started) {
-			fill(204, 105, 205);
-			noStroke();
-			let r = 40;
-			let actualWidth = w - r;
-			let newX = (actualWidth / this.count) * floor(this.progress * this.count);
-			ellipse(x + r / 2 + newX, y, r);
+		if (this.mode === "timer") {
+			super.draw(x, y, w, h);
+		} else {
+			if (this._ended) {
+				return;
+			}
+			if (this._started) {
+				fill(204, 105, 205);
+				noStroke();
+				let r = 40;
+				let actualWidth = w - r;
+				let newX =
+					(actualWidth / this.count) * floor(this.progress * this.count);
+				ellipse(x + r / 2 + newX, y, r);
+			}
 		}
 	}
 }
