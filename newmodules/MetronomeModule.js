@@ -32,6 +32,8 @@ export default class MetronomeModule extends Module {
 			if (this._started) {
 				fill(204, 105, 205);
 				noStroke();
+				text(this.title, x, y);
+				y += 20;
 				let r = 40;
 				let actualWidth = w - r;
 				let newX =

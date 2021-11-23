@@ -1,7 +1,7 @@
 export default class Module {
 	constructor(options) {
 		//Public
-		this.title = options.title;
+		this.title = options.title ?? " ";
 		if (options.start === undefined) {
 			console.error(
 				"A module has to have a start time. Module will not work as expected."
@@ -75,8 +75,12 @@ export default class Module {
 		if (this._ended) {
 			return;
 		}
-		fill(204, 105, 205);
-		noStroke();
-		rect(x, y, w * this.progress, h);
+		if (this._started) {
+			fill(204, 105, 205);
+			noStroke();
+			text(this.title, x, y);
+			y += 20;
+			rect(x, y, w * this.progress, h);
+		}
 	}
 }

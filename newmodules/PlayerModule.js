@@ -32,6 +32,7 @@ export default class PlayerModule extends Module {
 			loop: false,
 			url: options.recordingURL,
 			playbackRate: this.playbackRate,
+			volume: -70,
 			onload: () => {
 				this._loop = new Tone.Loop((time) => {
 					console.log("loop started: ", time);
@@ -44,8 +45,13 @@ export default class PlayerModule extends Module {
 					.start(this.start)
 					.stop(this.end);
 				Tone.Transport.scheduleOnce((time) => {
+					this._player.volume.rampTo(1, 0.1);
 					console.log("module started: ", time);
 				}, this.start);
+				Tone.Transport.scheduleOnce((time) => {
+					this._player.volume.rampTo(-70, 0.1);
+					console.log("module end: ", time);
+				}, this.end - 0.1);
 				options.moduleReady();
 			},
 			onstop: () => {

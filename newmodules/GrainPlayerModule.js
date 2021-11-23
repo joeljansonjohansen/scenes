@@ -20,6 +20,7 @@ export default class GrainPlayerModule extends PlayerModule {
 			loop: true,
 			url: options.recordingURL,
 			detune: this.transpose * 100,
+			volume: -70,
 			onload: () => {
 				this._loop = new Tone.Loop((time) => {
 					console.log(time);
@@ -27,6 +28,14 @@ export default class GrainPlayerModule extends PlayerModule {
 				}, this.loopLength)
 					.start(this.start)
 					.stop(this.end);
+				Tone.Transport.scheduleOnce((time) => {
+					this._player.volume.rampTo(1, 0.1);
+					console.log("module started: ", time);
+				}, this.start);
+				Tone.Transport.scheduleOnce((time) => {
+					this._player.volume.rampTo(-70, 0.1);
+					console.log("module end: ", time);
+				}, this.end - 0.1);
 				options.moduleReady();
 			},
 			onstop: () => {
