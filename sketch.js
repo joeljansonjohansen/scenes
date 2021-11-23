@@ -247,7 +247,7 @@ document
 	?.addEventListener("click", async () => {
 		await Tone.start();
 		console.log("audio is ready");
-		mic = new Tone.UserMedia(-10).toDestination();
+		mic = new Tone.UserMedia(-10);
 		mic
 			.open()
 			.then(() => {
