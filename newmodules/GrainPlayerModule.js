@@ -8,9 +8,9 @@ import PlayerModule from "./PlayerModule.js";
 
 export default class GrainPlayerModule extends PlayerModule {
 	set transposeBy(interval) {
-		this.transposed = interval;
+		this.transpose = interval;
 		if (this._player) {
-			this._player.detune = this.transposed * 100;
+			this._player.detune = this.transpose * 100;
 		}
 	}
 
@@ -19,9 +19,14 @@ export default class GrainPlayerModule extends PlayerModule {
 		this._player = new Tone.GrainPlayer({
 			loop: true,
 			url: options.recordingURL,
-			detune: this.transposed * 100,
+			detune: this.transpose * 100,
 			onload: () => {
-				console.log("grain player loaded");
+				this._loop = new Tone.Loop((time) => {
+					console.log(time);
+					this._player.start(time, 0, this.loopLength + 0.05);
+				}, this.loopLength)
+					.start(this.start)
+					.stop(this.end);
 				options.moduleReady();
 			},
 			onstop: () => {

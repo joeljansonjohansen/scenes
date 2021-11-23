@@ -9,16 +9,17 @@ import Module from "./Module.js";
 export default class MetronomeModule extends Module {
 	constructor(options) {
 		//Calculate the length of the metro if we only get a bpm.
-		let bpm = options.bpm ?? 120;
+		let bpm = options.bpm ?? Tone.Transport.bpm.value;
 		let count = options.count ?? 4;
-		let bpmLength = (60 / bpm) * count;
-		options.length = options.length ?? bpmLength;
+		//This should be made clearer
+		options.length =
+			Tone.Transport.toSeconds(options.length) ??
+			Tone.Transport.toSeconds("1m");
 		super(options);
 
 		this.count = count;
 		this.bpm = bpm;
 		this.mode = options.mode ?? "metro";
-		this.length = options.length ?? this._bpmLength ?? 0;
 	}
 
 	draw(x, y, w, h) {

@@ -2,16 +2,29 @@ export default class Module {
 	constructor(options) {
 		//Public
 		this.title = options.title;
-		this.start = options.start;
-		this.length = options.length;
+		if (options.start === undefined) {
+			console.error(
+				"A module has to have a start time. Module will not work as expected."
+			);
+		}
+		if (options.length === undefined) {
+			console.error(
+				"A module has to have a length. Module will not work as expected."
+			);
+		}
+		this.start = Tone.Transport.toSeconds(options.start);
+		this.length = Tone.Transport.toSeconds(options.length);
+		this.loopLength = options.loopLength
+			? Tone.Transport.toSeconds(options.loopLength)
+			: this.length;
 		this.end = this.start + this.length;
 
 		//Private
 		this._onEnd = options.onEnd;
 		this._started = false;
 		this._ended = false;
-		this._startInMs = options.start * 1000;
-		this._lengthInMs = options.length * 1000;
+		this._startInMs = this.start * 1000;
+		this._lengthInMs = this.length * 1000;
 		this._progress = 0;
 		// needs to be able to show progress
 		// callback on finished
@@ -23,12 +36,12 @@ export default class Module {
 		if (!this._initialTime) {
 			return 0;
 		}
-		let passedTime = Date.now() - this._initialTime;
+		let passedTime = Tone.Transport.seconds * 1000 - this._initialTime;
 		return passedTime / this._lengthInMs;
 	}
 
 	startModule() {
-		this._initialTime = Date.now();
+		this._initialTime = Tone.Transport.seconds * 1000;
 		console.log("Module started, do we need a callback?");
 		this._started = true;
 	}
@@ -43,7 +56,9 @@ export default class Module {
 	}
 
 	connect(toneAudioStream) {
-		console.error("This module does not support connecting, try player module or...");
+		console.error(
+			"This module does not support connecting, try player module or..."
+		);
 		return;
 	}
 

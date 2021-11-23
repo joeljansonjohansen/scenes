@@ -1,5 +1,4 @@
 import Module from "./newmodules/Module.js";
-import Transport from "./newmodules/Transport.js";
 import RecorderModule from "./newmodules/RecorderModule.js";
 import PlayerModule from "./newmodules/PlayerModule.js";
 import GrainPlayerModule from "./newmodules/GrainPlayerModule.js";
@@ -18,7 +17,10 @@ function setup() {
 
 function draw() {
 	background(244);
-	text(currentBar, 140, 140);
+	let tonePos = Tone.Transport.position.split(":");
+	let string = 1 + parseInt(tonePos[0]) + ":" + (1 + parseInt(tonePos[1]));
+	text(string, 140, 140);
+	//text(Tone.Transport.position, 140, 140);
 	//let passedTime = Date.now() - startTime;
 	let passedTime = Tone.Transport.seconds * 1000;
 	let index = 1;
@@ -34,24 +36,23 @@ function draw() {
 	//console.log("passedTime = ", passedTime / 1000);
 	//console.log("Tone.Transport.timeSignature = ", Tone.Transport.position);
 	//console.log(currentBar);
-	if (passedTime > lengthOfBar) {
-		lengthOfBar =
-			passedTime +
-			(60 / Tone.Transport.bpm.value) * Tone.Transport.timeSignature * 1000;
-		console.log(currentBar);
-		currentBar++;
-		//console.log("Tone.Transport.position = ", Tone.Transport.position);
-	}
+	// if (passedTime > lengthOfBar) {
+	// 	lengthOfBar =
+	// 		passedTime +
+	// 		(60 / Tone.Transport.bpm.value) * Tone.Transport.timeSignature * 1000;
+	// 	console.log(currentBar);
+	// 	currentBar++;
+	// 	//console.log("Tone.Transport.position = ", Tone.Transport.position);
+	// }
 }
 
-function setupScenes() {
+function setupModules() {
 	//Setup effects
 	let reverb = new Tone.Reverb(4.5, 1.0).toDestination();
 
 	let metro = new MetronomeModule({
-		start: 0,
-		bpm: 60,
-		count: 2,
+		start: 0.1,
+		length: "1m",
 		onEnd: () => {
 			console.log("metro module finished");
 			modules.splice(modules.indexOf(metro), 1);
@@ -59,29 +60,32 @@ function setupScenes() {
 	});
 	modules.push(metro);
 
-	let playerModule = new GrainPlayerModule({
-		start: metro.end + 5,
-		length: 40,
+	let playerModule = new PlayerModule({
+		start: "4m",
+		length: "4m",
+		loopLength: "4m",
+		transpose: -7,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModule), 1);
 		},
 	});
-	playerModule.addTranspositionChange(0.2, -7);
-	playerModule.addTranspositionChange(0.4, 0);
+	//playerModule.addTranspositionChange(0.2, -7);
+	//playerModule.addTranspositionChange(0.4, 0);
 	modules.push(playerModule);
 
-	let playerModulet = new GrainPlayerModule({
-		start: metro.end + 5,
-		length: 40,
-		transpose: 3,
+	let playerModulet = new PlayerModule({
+		start: "4m",
+		length: "4m",
+		loopLength: "4m",
+		transpose: -12,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModulet), 1);
 		},
 	});
-	playerModulet.addTranspositionChange(0.2, -3);
-	playerModulet.addTranspositionChange(0.4, 3);
+	// playerModulet.addTranspositionChange(0.2, -3);
+	// playerModulet.addTranspositionChange(0.4, 3);
 	modules.push(playerModulet);
 
 	// let playerModulee = new GrainPlayerModule({
@@ -96,8 +100,8 @@ function setupScenes() {
 	// modules.push(playerModulee);
 
 	let recorderModule = new RecorderModule({
-		start: metro.length,
-		length: 4,
+		start: metro.end,
+		length: "2m",
 		mic: mic,
 		onEnd: () => {
 			console.log("module finished");
@@ -115,13 +119,13 @@ function setupScenes() {
 					console.log("this is run");
 				},
 			});
-			playerModulee.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					playerModulee.connect(reverb);
-					console.log("this is run");
-				},
-			});
+			// playerModulee.prepareModule({
+			// 	recordingURL: recorderModule.recordingURL,
+			// 	moduleReady: () => {
+			// 		playerModulee.connect(reverb);
+			// 		console.log("this is run");
+			// 	},
+			// });
 			// playerModuleTwo.prepareModule({ recordingURL: recorderModule.recordingURL });
 			modules.splice(modules.indexOf(recorderModule), 1);
 		},
@@ -181,7 +185,7 @@ document
 	?.addEventListener("click", async () => {
 		await Tone.start();
 		console.log("audio is ready");
-		mic = new Tone.UserMedia(-10);
+		mic = new Tone.UserMedia(-10).toDestination();
 		mic
 			.open()
 			.then(() => {
@@ -194,10 +198,8 @@ document
 	});
 
 document.getElementById("startButton")?.addEventListener("click", () => {
-	setupScenes();
-	//let Transport = new Transport();
+	setupModules();
 	Tone.Transport.start();
-	startTime = Date.now();
 });
 
 window.setup = setup;

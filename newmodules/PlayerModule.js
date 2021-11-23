@@ -10,15 +10,17 @@ export default class PlayerModule extends Module {
 	constructor(options) {
 		super(options);
 		this.playbackRate = options.playbackRate ?? 1;
-		this.transposed = options.transpose ?? 0;
-		this.transposeBy = this.transposed;
+		this.transpose = options.transpose ?? 0;
+		if (this.transpose != 0) {
+			this.transposeBy = this.transpose;
+		}
 		this._transpositionChanges = [];
-		this._previousTransposition = this.transposed;
+		this._previousTransposition = this.transpose;
 	}
 
 	set transposeBy(interval) {
 		this.playbackRate = Tone.intervalToFrequencyRatio(interval);
-		this.transposed = interval;
+		this.transpose = interval;
 		if (this._player) {
 			this._player.playbackRate = this.playbackRate;
 		}
@@ -27,22 +29,29 @@ export default class PlayerModule extends Module {
 	prepareModule(options) {
 		//Function for any preparations that cannot be done in the setup but should be done before start to save valuable time at the starting point.
 		this._player = new Tone.Player({
-			loop: true,
+			loop: false,
 			url: options.recordingURL,
 			playbackRate: this.playbackRate,
 			onload: () => {
-				console.log("player loaded");
+				this._loop = new Tone.Loop((time) => {
+					console.log("loop started: ", time);
+					this._player.start(
+						time,
+						0,
+						this.loopLength * this._player.playbackRate + 0.05
+					);
+				}, this.loopLength)
+					.start(this.start)
+					.stop(this.end);
+				Tone.Transport.scheduleOnce((time) => {
+					console.log("module started: ", time);
+				}, this.start);
 				options.moduleReady();
 			},
 			onstop: () => {
 				console.log("playerStopped");
 			},
 		}).toDestination();
-	}
-
-	startModule() {
-		this._player.start().stop("+" + this.length);
-		super.startModule();
 	}
 
 	connect(toneAudioStream) {
@@ -59,15 +68,15 @@ export default class PlayerModule extends Module {
 		if (this._ended) {
 			return;
 		}
-		if (this._started) {
+		/*if (this._started) {
 			for (let change of this._transpositionChanges) {
 				if (this.progress >= change.timing) {
-					if (this.transposed != change.interval) {
+					if (this.transpose != change.interval) {
 						this.transposeBy = change.interval;
 						console.log("changed interval");
 					} else {
-						if (this._previousTransposition != this.transposed) {
-							this._previousTransposition = this.transposed;
+						if (this._previousTransposition != this.transpose) {
+							this._previousTransposition = this.transpose;
 							this._transpositionChanges.splice(
 								this._transpositionChanges.indexOf(change),
 								1
@@ -78,22 +87,22 @@ export default class PlayerModule extends Module {
 
 				// Implementation of a portamentoversion
 				// if (this.progress >= change.timing) {
-				// 	if (this.transposed != change.interval) {
+				// 	if (this.transpose != change.interval) {
 				// 		let direction =
 				// 			change.interval - this._previousTransposition < 0 ? "down" : "up";
 				// 		let computedChange;
 				// 		if (direction == "up") {
-				// 			this.transposed += 0.05;
-				// 			computedChange = constrain(this.transposed, -48, change.interval);
+				// 			this.transpose += 0.05;
+				// 			computedChange = constrain(this.transpose, -48, change.interval);
 				// 		} else {
-				// 			this.transposed -= 0.05;
-				// 			computedChange = constrain(this.transposed, change.interval, 48);
+				// 			this.transpose -= 0.05;
+				// 			computedChange = constrain(this.transpose, change.interval, 48);
 				// 		}
 				// 		console.log(round(computedChange * 100) / 100);
 				// 		this.transposeBy = round(computedChange * 100) / 100;
 				// 	} else {
-				// 		if (this._previousTransposition != this.transposed) {
-				// 			this._previousTransposition = this.transposed;
+				// 		if (this._previousTransposition != this.transpose) {
+				// 			this._previousTransposition = this.transpose;
 				// 			this._transpositionChanges.splice(
 				// 				this._transpositionChanges.indexOf(change),
 				// 				1
@@ -102,6 +111,6 @@ export default class PlayerModule extends Module {
 				// 	}
 				// }
 			}
-		}
+		}*/
 	}
 }
