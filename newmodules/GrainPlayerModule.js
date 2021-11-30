@@ -7,6 +7,10 @@ import PlayerModule from "./PlayerModule.js";
     */
 
 export default class GrainPlayerModule extends PlayerModule {
+	constructor(options) {
+		super(options);
+		this.title = options.title ?? "Grainplayer";
+	}
 	set transposeBy(interval) {
 		this.transpose = interval;
 		if (this._player) {
@@ -24,7 +28,13 @@ export default class GrainPlayerModule extends PlayerModule {
 			onload: () => {
 				this._loop = new Tone.Loop((time) => {
 					console.log(time);
-					this._player.start(time, 0, this.loopLength + 0.05);
+					this._player.start(time, this.offset, this.loopLength + 0.05);
+					this._player.volume.rampTo(0, 0.1, time);
+					this._player.volume.rampTo(
+						-Infinity,
+						0.1,
+						time + this.loopLength - 0.15
+					);
 				}, this.loopLength)
 					.start(this.start)
 					.stop(this.end);

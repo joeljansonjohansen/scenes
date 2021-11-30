@@ -17,6 +17,7 @@ export default class MetronomeModule extends Module {
 			Tone.Transport.toSeconds("1m");
 		super(options);
 
+		this.title = options.title ?? "Metronome";
 		this.count = count;
 		this.bpm = bpm;
 		this.mode = options.mode ?? "metro";

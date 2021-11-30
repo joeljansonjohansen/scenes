@@ -1,7 +1,7 @@
 export default class Module {
 	constructor(options) {
 		//Public
-		this.title = options.title ?? " ";
+		this.title = options.title ?? "Module";
 		if (options.start === undefined) {
 			console.error(
 				"A module has to have a start time. Module will not work as expected."
@@ -14,10 +14,9 @@ export default class Module {
 		}
 		this.start = Tone.Transport.toSeconds(options.start);
 		this.length = Tone.Transport.toSeconds(options.length);
-		this.loopLength = options.loopLength
-			? Tone.Transport.toSeconds(options.loopLength)
-			: this.length;
 		this.end = this.start + this.length;
+		// console.log(this.end);
+		// console.log(this.length);
 
 		//Private
 		this._onEnd = options.onEnd;
@@ -30,14 +29,21 @@ export default class Module {
 		// callback on finished
 		// callback on started
 		// way to stop the module
+
+		// this._dur = 500;
+		// this._timing = 342;
 	}
 
 	get progress() {
+		return this.progressInMs / this._lengthInMs;
+	}
+
+	get progressInMs() {
 		if (!this._initialTime) {
 			return 0;
 		}
 		let passedTime = Tone.Transport.seconds * 1000 - this._initialTime;
-		return passedTime / this._lengthInMs;
+		return passedTime;
 	}
 
 	startModule() {

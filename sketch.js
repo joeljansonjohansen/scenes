@@ -7,10 +7,9 @@ import MetronomeModule from "./newmodules/MetronomeModule.js";
 let mic;
 let modules = [];
 let playerModules = [];
-let startTime = Infinity;
-let currentBar = -1;
-let lengthOfBar = 0;
-let uifont;
+// let currentBar = -1;
+// let lengthOfBar = 0;
+// let uifont;
 
 function preload() {
 	//uifont = loadFont("./assets/inconsolata.otf");
@@ -30,15 +29,14 @@ function draw() {
 	textSize(24);
 	text(string, 40, height - 40);
 	textSize(12);
-	//text(Tone.Transport.position, 140, 140);
-	//let passedTime = Date.now() - startTime;
+
 	let passedTime = Tone.Transport.seconds * 1000;
 	let index = 1;
 	for (let module of modules) {
 		let x = 40;
-		let y = 40 * index;
+		let y = 4 * index;
 		let w = 320;
-		let h = 20;
+		let h = 5;
 		module.update(passedTime);
 		module.draw(x, y, w, h);
 		index++;
@@ -87,7 +85,10 @@ function setupModules() {
 	//Setup effects
 	let reverb = new Tone.Reverb(5.5, 1.0).toDestination();
 
-	let metro = new MetronomeModule({
+	//How to connect things really?
+	//let tremolo = new Tone.Tremolo(9, 1).start().toDestination();
+
+	/* let metro = new MetronomeModule({
 		title: "Counting in",
 		start: 0.1,
 		length: "1m",
@@ -113,43 +114,6 @@ function setupModules() {
 		playerModules.push(playerModule);
 	}
 
-	// let playerModule = new GrainPlayerModule({
-	// 	start: "6:2",
-	// 	length: "1:2",
-	// 	transpose: -19,
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModule), 1);
-	// 	},
-	// });
-	// //playerModule.addTranspositionChange(0.2, -7);
-	// //playerModule.addTranspositionChange(0.4, 0);
-	// modules.push(playerModule);
-
-	// let playerModulet = new GrainPlayerModule({
-	// 	start: "6:3",
-	// 	length: "1:1",
-	// 	transpose: -13,
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModulet), 1);
-	// 	},
-	// });
-	// playerModulet.addTranspositionChange(0.2, -3);
-	// playerModulet.addTranspositionChange(0.4, 3);
-	//modules.push(playerModulet);
-
-	// let playerModulee = new GrainPlayerModule({
-	// 	start: metro.end + 5,
-	// 	length: 40,
-	// 	transpose: 7,
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModulee), 1);
-	// 	},
-	// });
-	// modules.push(playerModulee);
-
 	let recorderModule = new RecorderModule({
 		title: "Recording",
 		start: metro.end,
@@ -166,46 +130,10 @@ function setupModules() {
 				});
 			}
 
-			// console.log("module finished");
-			// playerModule.prepareModule({
-			// 	recordingURL: recorderModule.recordingURL,
-			// 	moduleReady: () => {
-			// 		playerModule.connect(reverb);
-			// 		console.log("this is run");
-			// 	},
-			// });
-			// playerModulet.prepareModule({
-			// 	recordingURL: recorderModule.recordingURL,
-			// 	moduleReady: () => {
-			// 		playerModulet.connect(reverb);
-			// 		console.log("this is run");
-			// 	},
-			// });
-			// playerModulee.prepareModule({
-			// 	recordingURL: recorderModule.recordingURL,
-			// 	moduleReady: () => {
-			// 		playerModulee.connect(reverb);
-			// 		console.log("this is run");
-			// 	},
-			// });
-			// playerModuleTwo.prepareModule({ recordingURL: recorderModule.recordingURL });
 			modules.splice(modules.indexOf(recorderModule), 1);
 		},
 	});
-	modules.push(recorderModule);
-
-	// let playerModuleThree = new PlayerModule({
-	// 	start: 5000,
-	// 	length: 2000,
-	// 	audiofile: "recording-1",
-	// 	recordings: recordings,
-	// 	playbackRate: 0.84,
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModuleThree), 1);
-	// 	},
-	// });
-	// modules.push(playerModuleThree);
+	modules.push(recorderModule); */
 
 	/*
 
@@ -240,6 +168,122 @@ function setupModules() {
 
 
     */
+
+	// let timingModule = new Module({
+	// 	start: 0.1,
+	// 	length: "2m",
+	// 	onEnd: () => {
+	// 		console.log("metro module finished");
+	// 		modules.splice(modules.indexOf(timingModule), 1);
+	// 	},
+	// });
+	// modules.push(timingModule);
+
+	let playerModule = new PlayerModule({
+		start: "5m",
+		length: "40m",
+		transpose: -7,
+		offset: "8n",
+		loopLength: "1m",
+		loopFadeIn: 0.01,
+		loopFadeOut: Tone.Transport.toSeconds("8n") - 0.2,
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModule), 1);
+		},
+	});
+	// playerModule.addTranspositionChange("2m", -12, "4m");
+	// playerModule.prepareModule({
+	// 	recordingURL: "./assets/ravel.mp3",
+	// 	moduleReady: () => {
+	// 		// const fShift = new Tone.PitchShift(-0.5).toDestination();
+	// 		// playerModule.connect(fShift);
+	// 		playerModule.connect(reverb);
+	// 		console.log("Recorder module connected to other module");
+	// 		modules.push(playerModule);
+	// 	},
+	// });
+
+	let playerModuleTwo = new PlayerModule({
+		start: "5m",
+		length: "40m",
+		transpose: -12,
+		offset: "4n",
+		loopLength: "2n.",
+		loopFadeIn: 0.01,
+		loopFadeOut: Tone.Transport.toSeconds("2n.") - 0.2,
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModuleTwo), 1);
+		},
+	});
+	// playerModuleTwo.addTranspositionChange("2m", -12, "4m");
+	// playerModuleTwo.prepareModule({
+	// 	recordingURL: "./assets/ravel.mp3",
+	// 	moduleReady: () => {
+	// 		// const fShift = new Tone.PitchShift(-0.5).toDestination();
+	// 		// playerModuleTwo.connect(fShift);
+	// 		playerModuleTwo.connect(reverb);
+	// 		console.log("Recorder module connected to other module");
+	// 		modules.push(playerModuleTwo);
+	// 	},
+	// });
+
+	let recorderModule = new RecorderModule({
+		title: "Recording",
+		start: "1m",
+		length: "3m",
+		mic: mic,
+		onEnd: () => {
+			playerModule.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					// const fShift = new Tone.PitchShift(-0.5).toDestination();
+					// playerModuleTwo.connect(fShift);
+					playerModule.connect(reverb);
+					console.log("Recorder module connected to other module");
+					modules.push(playerModule);
+				},
+			});
+			playerModuleTwo.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					// const fShift = new Tone.PitchShift(-0.5).toDestination();
+					// playerModuleTwo.connect(fShift);
+					playerModuleTwo.connect(reverb);
+					console.log("Recorder module connected to other module");
+					modules.push(playerModuleTwo);
+				},
+			});
+			modules.splice(modules.indexOf(recorderModule), 1);
+		},
+	});
+	modules.push(recorderModule);
+
+	/* let playerModuleThree = new PlayerModule({
+		start: "1:2",
+		length: "10m",
+		offset: "2n",
+		transpose: 0,
+		loopLength: "1:2",
+		loopFadeIn: 0.01,
+		loopFadeOut: Tone.Transport.toSeconds("0:1") - 0.2,
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModuleThree), 1);
+		},
+	});
+	// playerModuleThree.addTranspositionChange("2m", -12, "4m");
+	playerModuleThree.prepareModule({
+		recordingURL: "./assets/ravel.mp3",
+		moduleReady: () => {
+			// const fShift = new Tone.PitchShift(-0.5).toDestination();
+			// playerModuleThree.connect(fShift);
+			playerModuleThree.connect(reverb);
+			console.log("Recorder module connected to other module");
+			modules.push(playerModuleThree);
+		},
+	}); */
 }
 
 document
@@ -247,7 +291,7 @@ document
 	?.addEventListener("click", async () => {
 		await Tone.start();
 		console.log("audio is ready");
-		mic = new Tone.UserMedia(-10);
+		mic = new Tone.UserMedia();
 		mic
 			.open()
 			.then(() => {
