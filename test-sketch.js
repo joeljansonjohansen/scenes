@@ -44,7 +44,7 @@ function setupModules() {
 	let reverb = new Tone.Reverb(5.5, 1.0).toDestination();
 
 	//How to connect things really?
-	//let tremolo = new Tone.Tremolo(9, 1).start().toDestination();
+	// let tremolo = new Tone.Tremolo(9, 1).start().toDestination();
 
 	let playerModule = new OneShotPlayerModule({
 		start: "5m",
@@ -91,30 +91,30 @@ function setupModules() {
 		},
 	}); */
 
-	// let playerModuleThree = new PlayerModule({
-	// 	start: "5m",
-	// 	length: "3m",
-	// 	transpose: -12,
-	// 	loopLength: "2n",
-	// 	loopFadeIn: 0.05,
-	// 	loopFadeOut: 0.5,
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModuleThree), 1);
-	// 	},
-	// });
-	// let playerModuleFour = new PlayerModule({
-	// 	start: "8m",
-	// 	length: "40m",
-	// 	transpose: -19,
-	// 	loopLength: "2n",
-	// 	loopFadeIn: 0.05,
-	// 	loopFadeOut: 0.5,
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModuleFour), 1);
-	// 	},
-	// });
+	let playerModuleThree = new PlayerModule({
+		start: "5m",
+		length: "3m",
+		transpose: -12,
+		loopLength: "2n",
+		loopFadeIn: 0.05,
+		loopFadeOut: 0.5,
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModuleThree), 1);
+		},
+	});
+	let playerModuleFour = new PlayerModule({
+		start: "8m",
+		length: "40m",
+		transpose: -19,
+		loopLength: "2n",
+		loopFadeIn: 0.05,
+		loopFadeOut: 0.5,
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModuleFour), 1);
+		},
+	});
 	let recorderModule = new RecorderModule({
 		title: "Recording",
 		start: "1m",
@@ -144,7 +144,7 @@ function setupModules() {
 			playerModuleThree.prepareModule({
 				recordingURL: recorderModule.recordingURL,
 				moduleReady: () => {
-					console.log("Recorder module connected to other module");
+					console.log("Recorder module connected to other");
 					playerModuleThree.connect(reverb);
 					modules.push(playerModuleThree);
 				},
@@ -152,7 +152,7 @@ function setupModules() {
 			playerModuleFour.prepareModule({
 				recordingURL: recorderModule.recordingURL,
 				moduleReady: () => {
-					console.log("Recorder module connected to other module");
+					console.log("Recorder module connected to");
 					playerModuleFour.connect(reverb);
 					modules.push(playerModuleFour);
 				},
