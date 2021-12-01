@@ -50,8 +50,16 @@ export default class OneShotPlayerModule extends PlayerModule {
 		Tone.Transport.scheduleOnce((time) => {
 			//console.log("Event was fired!", time);
 			//console.log("Density is", this.density);
-			let pan = -1 + Math.random() * 2;
-			const panner = new Tone.Panner(pan).toDestination();
+			let panRange = 2;
+			let initialPan = -1 + Math.random() * 2;
+			let panDest =
+				initialPan < 0
+					? initialPan + Math.random() * panRange
+					: initialPan - Math.random() * panRange;
+			panDest = panDest < -1 ? -1 : panDest;
+			panDest = panDest > 1 ? 1 : panDest;
+			//console.log(panDest);
+			const panner = new Tone.Panner(initialPan).toDestination();
 			const filter = new Tone.Filter(500 + Math.random() * 21500, "lowpass");
 
 			let player = new Tone.GrainPlayer({
@@ -59,7 +67,8 @@ export default class OneShotPlayerModule extends PlayerModule {
 				url: this.buffer,
 				volume: -Infinity,
 				//playbackRate: Math.random(),
-				detune: this.detune + -50 + Math.random() * 50,
+				//detune: this.detune + -50 + Math.random() * 50,
+				detune: -700 + -15 + Math.random() * 15,
 				onstop: () => {
 					//console.log("ended");
 					player.dispose();
@@ -76,6 +85,7 @@ export default class OneShotPlayerModule extends PlayerModule {
 				this.loopFadeOut,
 				time + this.loopLength - (this.loopFadeOut + 0.05)
 			);
+			panner.pan.rampTo(panDest, this.loopLength, time);
 		}, eventTime);
 		let nextTime = eventTime + Math.random() * (2 * this.density);
 		//console.log(nextTime);

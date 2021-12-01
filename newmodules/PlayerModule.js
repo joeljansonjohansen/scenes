@@ -36,15 +36,15 @@ export default class PlayerModule extends Module {
 		 * Use fadeIn and fadeOut for fading in or out of the entire module length.
 		 * Use loopFadeIn and loopFadeOut to fade on every loop (for sidechain eg.).
 		 */
-		this.fadeIn = options.fadeIn ?? 0;
-		this.fadeOut = options.fadeOut ?? 0;
+		this.fadeIn = Tone.Transport.toSeconds(options.fadeIn) ?? 0;
+		this.fadeOut = Tone.Transport.toSeconds(options.fadeOut) ?? 0;
 		if (this.fadeIn + this.fadeOut >= this.length) {
 			console.error(
 				"Warning! You are trying to set the fadeIn and fadeOut to something bigger than the length."
 			);
 		}
-		this.loopFadeIn = options.loopFadeIn ?? 0;
-		this.loopFadeOut = options.loopFadeOut ?? 0;
+		this.loopFadeIn = Tone.Transport.toSeconds(options.loopFadeIn) ?? 0;
+		this.loopFadeOut = Tone.Transport.toSeconds(options.loopFadeOut) ?? 0;
 		if (this.loopFadeIn + this.loopFadeOut >= this.loopLength) {
 			console.error(
 				"Warning! You are trying to set the loopFadeIn and loopFadeOut to something bigger than the length."
@@ -101,7 +101,7 @@ export default class PlayerModule extends Module {
 		return this;
 	}
 
-	addTranspositionChange(timing, interval, duration = "1m") {
+	addTranspositionChange(timing, interval, duration = 0.05) {
 		this._transpositionChanges.push({
 			timing: Tone.Transport.toSeconds(timing) * 1000,
 			interval: interval,

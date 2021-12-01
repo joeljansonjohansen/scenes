@@ -47,18 +47,18 @@ function setupModules() {
 	//let tremolo = new Tone.Tremolo(9, 1).start().toDestination();
 
 	let playerModule = new OneShotPlayerModule({
-		start: "1m",
+		start: "5m",
 		length: "54m",
-		loopLength: 3,
-		loopFadeIn: 0.1,
-		loopFadeOut: 2.4,
-		density: 0.3,
+		loopLength: "2n",
+		loopFadeIn: "8n",
+		loopFadeOut: "8n",
+		density: 3.3,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModule), 1);
 		},
 	});
-	playerModule.prepareModule({
+	/* playerModule.prepareModule({
 		recordingURL: "./assets/ravel.mp3",
 		//recordingURL: "./assets/saxophone-c4.mp3",
 		moduleReady: () => {
@@ -66,22 +66,22 @@ function setupModules() {
 			console.log("Recorder module connected to other module");
 			modules.push(playerModule);
 		},
-	});
+	}); */
 
 	let playerModuleTwo = new OneShotPlayerModule({
-		start: "1m",
+		start: "5m",
 		length: "54m",
 		loopLength: 4,
 		loopFadeIn: 0.1,
 		loopFadeOut: 2.4,
-		density: 0.3,
+		density: 2.3,
 		volume: -10,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModuleTwo), 1);
 		},
 	});
-	playerModuleTwo.prepareModule({
+	/* playerModuleTwo.prepareModule({
 		//recordingURL: "./assets/ravel.mp3",
 		recordingURL: "./assets/saxophone-c4.mp3",
 		moduleReady: () => {
@@ -89,7 +89,78 @@ function setupModules() {
 			console.log("Recorder module connected to other module");
 			modules.push(playerModuleTwo);
 		},
+	}); */
+
+	// let playerModuleThree = new PlayerModule({
+	// 	start: "5m",
+	// 	length: "3m",
+	// 	transpose: -12,
+	// 	loopLength: "2n",
+	// 	loopFadeIn: 0.05,
+	// 	loopFadeOut: 0.5,
+	// 	onEnd: () => {
+	// 		console.log("module finished");
+	// 		modules.splice(modules.indexOf(playerModuleThree), 1);
+	// 	},
+	// });
+	// let playerModuleFour = new PlayerModule({
+	// 	start: "8m",
+	// 	length: "40m",
+	// 	transpose: -19,
+	// 	loopLength: "2n",
+	// 	loopFadeIn: 0.05,
+	// 	loopFadeOut: 0.5,
+	// 	onEnd: () => {
+	// 		console.log("module finished");
+	// 		modules.splice(modules.indexOf(playerModuleFour), 1);
+	// 	},
+	// });
+	let recorderModule = new RecorderModule({
+		title: "Recording",
+		start: "1m",
+		length: "3m",
+		mic: mic,
+		onEnd: () => {
+			playerModule.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					// const fShift = new Tone.PitchShift(-0.5).toDestination();
+					// playerModuleTwo.connect(fShift);
+					//playerModule.connect(reverb);
+					console.log("Recorder module connected to other module");
+					modules.push(playerModule);
+				},
+			});
+			playerModuleTwo.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					// const fShift = new Tone.PitchShift(-0.5).toDestination();
+					// playerModuleTwo.connect(fShift);
+					//playerModuleTwo.connect(reverb);
+					console.log("Recorder module connected to other module");
+					modules.push(playerModuleTwo);
+				},
+			});
+			playerModuleThree.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					console.log("Recorder module connected to other module");
+					playerModuleThree.connect(reverb);
+					modules.push(playerModuleThree);
+				},
+			});
+			playerModuleFour.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					console.log("Recorder module connected to other module");
+					playerModuleFour.connect(reverb);
+					modules.push(playerModuleFour);
+				},
+			});
+			modules.splice(modules.indexOf(recorderModule), 1);
+		},
 	});
+	modules.push(recorderModule);
 }
 
 document
