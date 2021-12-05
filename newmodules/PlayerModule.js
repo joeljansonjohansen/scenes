@@ -11,6 +11,7 @@ export default class PlayerModule extends Module {
 		super(options);
 		this.title = options.title ?? "Player";
 		this.volume = options.volume ?? 0;
+		this.channel = new Tone.Volume(-60).toDestination();
 		/*Regarding pitch
 		 * It should be made clear what the difference is between playbackRate and
 		 * transpose. Is it really necessary to have both? Yes for the Grainplayer?
@@ -27,7 +28,7 @@ export default class PlayerModule extends Module {
 		 * Offset sets the players starting position. I don't know yet how this plays
 		 * with the loopLength.
 		 */
-		this.offset = options.offset ?? 0;
+		this.offset = this.checkForValueAndConvertToSeconds(options.offset);
 		this.loopLength = options.loopLength
 			? Tone.Transport.toSeconds(options.loopLength)
 			: this.length;
@@ -36,20 +37,27 @@ export default class PlayerModule extends Module {
 		 * Use fadeIn and fadeOut for fading in or out of the entire module length.
 		 * Use loopFadeIn and loopFadeOut to fade on every loop (for sidechain eg.).
 		 */
-		this.fadeIn = Tone.Transport.toSeconds(options.fadeIn) ?? 0;
-		this.fadeOut = Tone.Transport.toSeconds(options.fadeOut) ?? 0;
+		this.fadeIn = this.checkForValueAndConvertToSeconds(options.fadeIn);
+		this.fadeOut = this.checkForValueAndConvertToSeconds(options.fadeOut);
 		if (this.fadeIn + this.fadeOut >= this.length) {
 			console.error(
 				"Warning! You are trying to set the fadeIn and fadeOut to something bigger than the length."
 			);
 		}
-		this.loopFadeIn = Tone.Transport.toSeconds(options.loopFadeIn) ?? 0;
-		this.loopFadeOut = Tone.Transport.toSeconds(options.loopFadeOut) ?? 0;
+		this.loopFadeIn = this.checkForValueAndConvertToSeconds(options.loopFadeIn);
+		this.loopFadeOut = this.checkForValueAndConvertToSeconds(
+			options.loopFadeOut
+		);
+		console.log(this.loopFadeOut);
 		if (this.loopFadeIn + this.loopFadeOut >= this.loopLength) {
 			console.error(
 				"Warning! You are trying to set the loopFadeIn and loopFadeOut to something bigger than the length."
 			);
 		}
+	}
+
+	checkForValueAndConvertToSeconds(value) {
+		return value ? Tone.Transport.toSeconds(value) : 0;
 	}
 
 	set transposeBy(interval) {
@@ -80,6 +88,12 @@ export default class PlayerModule extends Module {
 				}, this.loopLength)
 					.start(this.start)
 					.stop(this.end);
+				this.channel.volume.rampTo(0, this.fadeIn, this.start);
+				this.channel.volume.rampTo(
+					-Infinity,
+					this.fadeOut,
+					this.end - this.fadeOut
+				);
 				// Tone.Transport.scheduleOnce((time) => {
 				// 	// this._player.volume.rampTo(0, 0.1);
 				// 	console.log("module started: ", time);

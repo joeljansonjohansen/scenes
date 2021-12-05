@@ -28,7 +28,7 @@ function draw() {
 	let passedTime = Tone.Transport.seconds * 1000;
 	let index = 1;
 	for (let module of modules) {
-		module.detune = detune;
+		//module.detune = detune;
 		let x = 40;
 		let y = 4 * index;
 		let w = 320;
@@ -39,6 +39,30 @@ function draw() {
 	}
 }
 
+let players = [
+	{ detune: 0, triggerLength: "1m", start: "10m", length: "8m" },
+	//{ detune: -700, triggerLength: "8n", start: "2m", length: "8m" },
+	{
+		detune: -1200,
+		offset: "1m",
+		triggerLength: "4n",
+		start: "10m",
+		length: "8m",
+	},
+	{ detune: 0, randomize: true, offset: "1m", start: "2m", length: "28m" },
+	{ detune: -700, randomize: true, offset: "1m", start: "2m", length: "8m" },
+	{ detune: -400, randomize: true, offset: "1m", start: "10m", length: "8m" },
+	{ detune: -700, triggerLength: "1m", start: "10m", length: "8m" },
+	// { detune: -400, triggerLength: "8n", start: "10m", length: "8m" },
+	{ detune: -400, triggerLength: "4n", start: "18m", length: "8m" },
+	{ detune: -800, triggerLength: "8t", start: "24m", length: "8m" },
+	{ detune: -1200, triggerLength: "1m", start: "28m", length: "8m" },
+	{ detune: -700, triggerLength: "8n", start: "32m", length: "8m" },
+	{ detune: -3600, triggerLength: "4n", start: "36m", length: "8m" },
+	{ detune: 0, triggerLength: "8t", start: "40m", length: "8m" },
+];
+let actualPlayers = [];
+
 function setupModules() {
 	//Setup effects
 	let reverb = new Tone.Reverb(5.5, 1.0).toDestination();
@@ -46,18 +70,26 @@ function setupModules() {
 	//How to connect things really?
 	// let tremolo = new Tone.Tremolo(9, 1).start().toDestination();
 
-	let playerModule = new OneShotPlayerModule({
-		start: "5m",
-		length: "54m",
-		loopLength: "2n",
-		loopFadeIn: "8n",
-		loopFadeOut: "8n",
-		density: 3.3,
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModule), 1);
-		},
-	});
+	for (let player of players) {
+		let playerModule = new OneShotPlayerModule({
+			start: player.start,
+			length: player.length,
+			loopLength: "1m",
+			loopFadeIn: 0.01,
+			loopFadeOut: 0.01,
+			randomize: player.randomize,
+			offset: player.offset ?? 0,
+			density: 0.5,
+			detune: player.detune,
+			triggerLength: player.triggerLength,
+			onEnd: () => {
+				console.log("module finished");
+				modules.splice(modules.indexOf(playerModule), 1);
+			},
+		});
+		actualPlayers.push(playerModule);
+	}
+
 	/* playerModule.prepareModule({
 		recordingURL: "./assets/ravel.mp3",
 		//recordingURL: "./assets/saxophone-c4.mp3",
@@ -68,21 +100,23 @@ function setupModules() {
 		},
 	}); */
 
-	let playerModuleTwo = new OneShotPlayerModule({
-		start: "5m",
-		length: "54m",
-		loopLength: 4,
-		loopFadeIn: 0.1,
-		loopFadeOut: 2.4,
-		density: 2.3,
-		volume: -10,
+	/* let playerModuleTwo = new OneShotPlayerModule({
+		start: "25m",
+		length: "20m",
+		loopLength: "1m",
+		// loopFadeIn: "2n",
+		// loopFadeOut: "2n",
+		//density: 0.3,
+		// detune: -1600,
+		measured: true,
+		triggerLength: "1m",
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModuleTwo), 1);
 		},
-	});
+	}); */
 	/* playerModuleTwo.prepareModule({
-		//recordingURL: "./assets/ravel.mp3",
+		// recordingURL: "./assets/ravel.mp3",
 		recordingURL: "./assets/saxophone-c4.mp3",
 		moduleReady: () => {
 			//playerModule.connect(reverb);
@@ -91,72 +125,24 @@ function setupModules() {
 		},
 	}); */
 
-	let playerModuleThree = new PlayerModule({
-		start: "5m",
-		length: "3m",
-		transpose: -12,
-		loopLength: "2n",
-		loopFadeIn: 0.05,
-		loopFadeOut: 0.5,
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModuleThree), 1);
-		},
-	});
-	let playerModuleFour = new PlayerModule({
-		start: "8m",
-		length: "40m",
-		transpose: -19,
-		loopLength: "2n",
-		loopFadeIn: 0.05,
-		loopFadeOut: 0.5,
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModuleFour), 1);
-		},
-	});
 	let recorderModule = new RecorderModule({
 		title: "Recording",
 		start: "1m",
-		length: "3m",
+		length: "2m",
 		mic: mic,
 		onEnd: () => {
-			playerModule.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					// const fShift = new Tone.PitchShift(-0.5).toDestination();
-					// playerModuleTwo.connect(fShift);
-					//playerModule.connect(reverb);
-					console.log("Recorder module connected to other module");
-					modules.push(playerModule);
-				},
-			});
-			playerModuleTwo.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					// const fShift = new Tone.PitchShift(-0.5).toDestination();
-					// playerModuleTwo.connect(fShift);
-					//playerModuleTwo.connect(reverb);
-					console.log("Recorder module connected to other module");
-					modules.push(playerModuleTwo);
-				},
-			});
-			playerModuleThree.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					console.log("Recorder module connected to other");
-					playerModuleThree.connect(reverb);
-					modules.push(playerModuleThree);
-				},
-			});
-			playerModuleFour.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					console.log("Recorder module connected to");
-					playerModuleFour.connect(reverb);
-					modules.push(playerModuleFour);
-				},
-			});
+			for (let playerModule of actualPlayers) {
+				playerModule.prepareModule({
+					recordingURL: recorderModule.recordingURL,
+					moduleReady: () => {
+						// const fShift = new Tone.PitchShift(-0.5).toDestination();
+						// playerModuleTwo.connect(fShift);
+						//playerModule.connect(reverb);
+						console.log("Recorder module connected to other module");
+						modules.push(playerModule);
+					},
+				});
+			}
 			modules.splice(modules.indexOf(recorderModule), 1);
 		},
 	});
