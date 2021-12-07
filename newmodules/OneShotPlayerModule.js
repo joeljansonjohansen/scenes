@@ -53,16 +53,15 @@ export default class OneShotPlayerModule extends PlayerModule {
 
 				/*
 				 * If we want the module to "linger", we need to add a fade and make the length longer.
+				 * Or do you sometimes not want to fadeOut? Actually we want to know when the module is finished.
+				 * So maybe we could set an internal stop or "decayLength" that we add to the "length" of the player.
 				 */
-				Tone.Transport.scheduleOnce((time) => {
-					console.log("schedule happens");
-					this.channel.volume.rampTo(0, this.fadeIn, time);
-					this.channel.volume.rampTo(
-						-60,
-						this.fadeOut,
-						time + (this.length - this.fadeOut)
-					);
-				}, this.start);
+				this.channel.volume.rampTo(0, this.fadeIn, this.start);
+				this.channel.volume.rampTo(
+					-Infinity,
+					this.fadeOut,
+					this.end - this.fadeOut
+				);
 			},
 			onerror: (error) => {
 				console.log("Buffer error: ", error);
@@ -74,6 +73,11 @@ export default class OneShotPlayerModule extends PlayerModule {
 		Tone.Transport.scheduleOnce((time) => {
 			//console.log("Event was fired!", time);
 			//console.log("Density is", this.density);
+
+			/*
+			 * Setup pan values. First the randomized initial pan and then the destination pan.
+			 * Then setup the panner.
+			 */
 			let panRange = 2;
 			let initialPan = -1 + Math.random() * 2;
 			let panDest =
@@ -82,12 +86,24 @@ export default class OneShotPlayerModule extends PlayerModule {
 					: initialPan - Math.random() * panRange;
 			panDest = panDest < -1 ? -1 : panDest;
 			panDest = panDest > 1 ? 1 : panDest;
-			//console.log(panDest);
+
 			const panner = new Tone.Panner(initialPan);
+
+			/*
+			 * Setup the filter
+			 */
 			const filter = new Tone.Filter(500 + Math.random() * 21500, "lowpass");
+
+			/*
+			 * Setup the delay and add it to the internal delay-array for disposing them later.
+			 */
 			const feedbackDelay = new Tone.FeedbackDelay(0.1, 0.5); //.toDestination();
 			this.delays.push(feedbackDelay);
 
+			/*
+			 * Setup the Player, this could be a Player or a GrainPlayer
+			 * dispose the effects and the player in the onStop.
+			 */
 			let player = new Tone.GrainPlayer({
 				loop: false,
 				url: this.buffer,
@@ -102,13 +118,25 @@ export default class OneShotPlayerModule extends PlayerModule {
 				onstop: () => {
 					//console.log("ended");
 					player.dispose();
-					panner.dispose();
-					filter.dispose();
+					panner?.dispose();
+					filter?.dispose();
 					//feedbackDelay.dispose();
 				},
 			})
 				.start(time, this.offset)
 				.stop(time + this.loopLength);
+
+			/*
+			 * Perhaps this could be changed into an envelope. Or maybe this is good for now.
+			 */
+			player.volume.rampTo(this.volume, this.loopFadeIn, time);
+			player.volume.rampTo(
+				-Infinity,
+				this.loopFadeOut,
+				time + this.loopLength - this.loopFadeOut
+			);
+
+			//This has to be rewritten
 			if (this.randomize) {
 				player.chain(filter, panner);
 				if (Math.random() > 0.2) {
@@ -122,13 +150,8 @@ export default class OneShotPlayerModule extends PlayerModule {
 				player.chain(panner, this.reverb, this.channel);
 			}
 			feedbackDelay.delayTime.rampTo(Math.random(), Math.random() * 2.5, time);
-			player.volume.rampTo(this.volume, this.loopFadeIn, time);
-			player.volume.rampTo(
-				-Infinity,
-				this.loopFadeOut,
-				time + this.loopLength - this.loopFadeOut
-			);
 			panner.pan.rampTo(panDest, this.loopLength, time);
+			//To here
 		}, eventTime);
 
 		/*
@@ -146,11 +169,12 @@ export default class OneShotPlayerModule extends PlayerModule {
 		}
 	}
 	moduleFinished() {
-		//Clean up the delays and reverbs. Maybe this should be in a better way?
+		//Clean up the delays and reverbs. Maybe this should be in a better way? Disposing buffers?
 		for (let feedbackDelay of this.delays) {
 			feedbackDelay.dispose();
 		}
 		this.reverb.dispose();
+		this.buffer.dispose();
 		super.moduleFinished();
 	}
 }

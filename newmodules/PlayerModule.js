@@ -28,36 +28,28 @@ export default class PlayerModule extends Module {
 		 * Offset sets the players starting position. I don't know yet how this plays
 		 * with the loopLength.
 		 */
-		this.offset = this.checkForValueAndConvertToSeconds(options.offset);
-		this.loopLength = options.loopLength
-			? Tone.Transport.toSeconds(options.loopLength)
-			: this.length;
+		this.offset = this.valueToSeconds(options.offset);
+		this.loopLength = this.valueToSeconds(options.loopLength, this.length);
 
 		/*Regarding fades
 		 * Use fadeIn and fadeOut for fading in or out of the entire module length.
 		 * Use loopFadeIn and loopFadeOut to fade on every loop (for sidechain eg.).
 		 */
-		this.fadeIn = this.checkForValueAndConvertToSeconds(options.fadeIn);
-		this.fadeOut = this.checkForValueAndConvertToSeconds(options.fadeOut);
+		this.fadeIn = this.valueToSeconds(options.fadeIn);
+		this.fadeOut = this.valueToSeconds(options.fadeOut);
 		if (this.fadeIn + this.fadeOut >= this.length) {
 			console.error(
 				"Warning! You are trying to set the fadeIn and fadeOut to something bigger than the length."
 			);
 		}
-		this.loopFadeIn = this.checkForValueAndConvertToSeconds(options.loopFadeIn);
-		this.loopFadeOut = this.checkForValueAndConvertToSeconds(
-			options.loopFadeOut
-		);
+		this.loopFadeIn = this.valueToSeconds(options.loopFadeIn);
+		this.loopFadeOut = this.valueToSeconds(options.loopFadeOut);
 		console.log(this.loopFadeOut);
 		if (this.loopFadeIn + this.loopFadeOut >= this.loopLength) {
 			console.error(
 				"Warning! You are trying to set the loopFadeIn and loopFadeOut to something bigger than the length."
 			);
 		}
-	}
-
-	checkForValueAndConvertToSeconds(value) {
-		return value ? Tone.Transport.toSeconds(value) : 0;
 	}
 
 	set transposeBy(interval) {

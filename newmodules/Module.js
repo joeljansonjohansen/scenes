@@ -1,3 +1,4 @@
+import Module from "./ModuleUtils.js";
 export default class Module {
 	constructor(options) {
 		//Public
@@ -12,8 +13,8 @@ export default class Module {
 				"A module has to have a length. Module will not work as expected."
 			);
 		}
-		this.start = Tone.Transport.toSeconds(options.start);
-		this.length = Tone.Transport.toSeconds(options.length);
+		this.start = this.valueToSeconds(Tone.Transport.toSeconds(options.start));
+		this.length = this.valueToSeconds(Tone.Transport.toSeconds(options.length));
 		this.end = this.start + this.length;
 		// console.log(this.end);
 		// console.log(this.length);
@@ -32,6 +33,11 @@ export default class Module {
 
 		// this._dur = 500;
 		// this._timing = 342;
+	}
+	valueToSeconds(value, chosenValue = 0) {
+		return value
+			? Tone.Transport.toSeconds(value)
+			: Tone.Transport.toSeconds(chosenValue);
 	}
 
 	get progress() {

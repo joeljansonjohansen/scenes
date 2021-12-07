@@ -45,10 +45,10 @@ function setupModules() {
 
 	let playerModule = new OneShotPlayerModule({
 		start: "1m",
-		length: "3m",
+		length: "20m",
 		fadeIn: "1m",
 		fadeOut: "1m",
-		loopLength: "2n",
+		loopLength: "1m",
 		loopFadeIn: 0.1,
 		loopFadeOut: 0.1,
 		randomize: true,
