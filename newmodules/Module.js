@@ -1,4 +1,3 @@
-import Module from "./ModuleUtils.js";
 export default class Module {
 	constructor(options) {
 		//Public
