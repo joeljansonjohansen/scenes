@@ -75,13 +75,18 @@ function setupModules() {
 	let playerModuleThree = new OSPlayerModule({
 		start: "1:0",
 		length: "15m",
-		loopLength: "2m",
-		density: 1.2,
-		loopFadeIn: "2n",
-		loopFadeOut: "1m",
-		detune: -700,
-		fadeOut: "3m",
-		decay: "3m",
+		loopLength: "1m",
+		interval: "4n",
+		scattering: true,
+		randomDetune: true,
+		//randomFiltering: true,
+		// density: 1.2,
+		loopFadeIn: "4n",
+		loopFadeOut: "4n",
+		detune: -1700,
+		fadeOut: 0.1,
+		// decay: "3m",
+		//randomDelay: true,
 		totalRandomization: true,
 		onEnd: () => {
 			console.log("module finished");
@@ -91,8 +96,8 @@ function setupModules() {
 	playerModuleThree.channel.connect(reverb);
 	playerModuleThree.prepareModule({
 		// recordingURL: "./assets/dulcimer.mp3",
-		// recordingURL: "./assets/saxophone-c4.mp3",
-		recordingURL: "./assets/ravel.mp3",
+		recordingURL: "./assets/saxophone-c4.mp3",
+		// recordingURL: "./assets/ravel.mp3",
 		moduleReady: () => {
 			//playerModule.connect(reverb);
 			console.log("Recorder module connected to other module");

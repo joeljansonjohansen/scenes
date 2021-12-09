@@ -15,7 +15,7 @@ export default class OSPlayerModule extends Module {
 		this.title = options.title ?? "OSPlayer";
 
 		/*
-		 * The channel connected to the module. Initial volume value is -60.
+		 * The channel connected to the module.
 		 */
 		this.channel = new Tone.Volume().toDestination();
 
@@ -24,9 +24,9 @@ export default class OSPlayerModule extends Module {
 		 * with the loopLength.
 		 */
 		this.offset = this.valueToSeconds(options.offset);
-		this.loopLength = this.valueToSeconds(options.loopLength, this.length);
+		this.loopLength = this.valueToSeconds(options.loopLength);
 
-		this._interval = this.valueToSeconds(options.interval, this.loopLength);
+		this._interval = this.valueToSeconds(options.interval, undefined);
 		this.density = options.density ?? undefined;
 		this.reverse = options.reverse ?? false;
 
@@ -112,6 +112,11 @@ export default class OSPlayerModule extends Module {
 			return Math.random() * (2 * this.density);
 		} else if (this._interval) {
 			return this._interval;
+		} else {
+			/*
+			 *If we don't have either density or interval, return 1 second as interval.
+			 */
+			return 1;
 		}
 	}
 
@@ -124,21 +129,32 @@ export default class OSPlayerModule extends Module {
 			reverse: this.reverse,
 			onload: () => {
 				options.moduleReady();
+
+				/*
+				 * Set the loopLength to the buffer.duration if loopLength is 0.
+				 * Also set the interval to the same if no interval is set.
+				 * Then start scheduling events.
+				 */
+				this.loopLength =
+					this.loopLength === 0 ? this.buffer.duration : this.loopLength;
+				this._interval = this._interval ? this._interval : this.loopLength;
+
 				this.scheduleEvent(this.start);
 
 				/*
-				 * If we want the module to "linger", we need to add a fade and make the length longer.
-				 * Or do you sometimes not want to fadeOut? Actually we want to know when the module is finished.
-				 * So maybe we could set an internal stop or "decayLength" that we add to the "length" of the player.
+				 * There is a variable called decay. This is only used
+				 * here, when the release of the envelope is triggered.
+				 * And functions as a way to let the module finish.
 				 */
 
 				Tone.Transport.scheduleOnce((time) => {
 					this._channelAmpEnv.triggerAttack(time);
 					this._channelAmpEnv.triggerRelease(
-						time + this.decay + this.length - this.fadeOut
+						time + this.length - this.fadeOut + this.decay
 					);
 				}, this.start);
 
+				//One way to change things would be to use Tone.js events. But maybe there is a better way?
 				// const seq = new Tone.Sequence(
 				// 	(time, note) => {
 				// 		//console.log(note);
@@ -207,7 +223,7 @@ export default class OSPlayerModule extends Module {
 				effectsToConnect.push(filter);
 			}
 
-			if (this.randomDelay && Math.random() > 0.8) {
+			if (this.randomDelay && Math.random() > 0.2) {
 				/*
 				 * Setup the delay and add it to the internal delay-array for disposing them later.
 				 * The random value in the if-statement above makes that every note is not affected by this.
@@ -238,6 +254,12 @@ export default class OSPlayerModule extends Module {
 			let _offset = Math.random() * this.buffer.duration;
 			_offset = _offset + this.loopLength > this.buffer.duration ? 0 : _offset;
 
+			const playerEnv = new Tone.AmplitudeEnvelope({
+				attack: this.loopFadeIn,
+				decay: 0.1,
+				sustain: 1,
+				release: this.loopFadeOut,
+			});
 			/*
 			 * Setup the Player, this could be a Player or a GrainPlayer
 			 * dispose the effects and the player in the onStop.
@@ -246,7 +268,7 @@ export default class OSPlayerModule extends Module {
 				loop: false,
 				//reverse: true,
 				url: bufferToPlay,
-				volume: -Infinity,
+				volume: volume,
 				detune: detune,
 				//playbackRate: this.playbackRate,
 				//detune: this.detune, // + (-50 + Math.random() * 50),
@@ -256,25 +278,35 @@ export default class OSPlayerModule extends Module {
 				//playbackRate: Tone.intervalToFrequencyRatio(this.detune / 100),
 				onstop: () => {
 					player.dispose();
+					playerEnv.dispose();
 					effectsToConnect.forEach((effect) => {
-						effect?.dispose();
+						if (!this.delays.includes(effect)) {
+							effect?.dispose();
+						}
 					});
 				},
 			})
 				.start(time, _offset)
-				.stop(time + this.loopLength);
+				.stop(time + this.loopLength + 0.1);
+			playerEnv.triggerAttack(time);
+			playerEnv.triggerRelease(time + this.loopLength - this.loopFadeOut);
 
 			/*
 			 * Perhaps this could be changed into an envelope. Or maybe this is good for now.
 			 */
-			player.volume.rampTo(volume, this.loopFadeIn, time);
-			player.volume.rampTo(
-				-Infinity,
-				this.loopFadeOut,
-				time + this.loopLength - this.loopFadeOut
-			);
+			// player.volume.rampTo(volume, this.loopFadeIn, time);
+			// player.volume.rampTo(
+			// 	-Infinity,
+			// 	this.loopFadeOut,
+			// 	time + (this.loopLength - this.loopFadeOut) - 0.1
+			// );
 
-			player.chain(...effectsToConnect, this._channelAmpEnv, this.channel);
+			player.chain(
+				playerEnv,
+				...effectsToConnect,
+				this._channelAmpEnv,
+				this.channel
+			);
 		}, eventTime);
 
 		/*
