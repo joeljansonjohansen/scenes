@@ -291,16 +291,6 @@ export default class OSPlayerModule extends Module {
 			playerEnv.triggerAttack(time);
 			playerEnv.triggerRelease(time + this.loopLength - this.loopFadeOut);
 
-			/*
-			 * Perhaps this could be changed into an envelope. Or maybe this is good for now.
-			 */
-			// player.volume.rampTo(volume, this.loopFadeIn, time);
-			// player.volume.rampTo(
-			// 	-Infinity,
-			// 	this.loopFadeOut,
-			// 	time + (this.loopLength - this.loopFadeOut) - 0.1
-			// );
-
 			player.chain(
 				playerEnv,
 				...effectsToConnect,
@@ -382,12 +372,14 @@ export default class OSPlayerModule extends Module {
 
 	/*
 	 * Cleaning up all the delays and buffers (and other things)
+	 * TODO: Perhaps wait to clean up the delays? What happens if we have a decay?
 	 */
 	moduleFinished() {
 		for (let feedbackDelay of this.delays) {
 			feedbackDelay.dispose();
 		}
 		this.buffer.dispose();
+		this.reversedBuffer.dispose();
 		super.moduleFinished();
 	}
 }

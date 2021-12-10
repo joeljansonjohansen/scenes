@@ -87,7 +87,8 @@ function setupModules() {
 		fadeOut: 0.1,
 		// decay: "3m",
 		//randomDelay: true,
-		totalRandomization: true,
+		//totalRandomization: true,
+		reverse: true,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModuleThree), 1);
@@ -96,8 +97,8 @@ function setupModules() {
 	playerModuleThree.channel.connect(reverb);
 	playerModuleThree.prepareModule({
 		// recordingURL: "./assets/dulcimer.mp3",
-		recordingURL: "./assets/saxophone-c4.mp3",
-		// recordingURL: "./assets/ravel.mp3",
+		// recordingURL: "./assets/saxophone-c4.mp3",
+		recordingURL: "./assets/ravel.mp3",
 		moduleReady: () => {
 			//playerModule.connect(reverb);
 			console.log("Recorder module connected to other module");
