@@ -1,8 +1,6 @@
-import Module from "./newmodules/Module.js";
-import RecorderModule from "./newmodules/RecorderModule.js";
-import PlayerModule from "./newmodules/PlayerModule.js";
-import GrainPlayerModule from "./newmodules/GrainPlayerModule.js";
-import MetronomeModule from "./newmodules/MetronomeModule.js";
+import Module from "./js/modules/Module.js";
+import RecorderModule from "./js/modules/RecorderModule.js.js.js";
+import MetronomeModule from "./js/modules/MetronomeModule.js";
 
 let mic;
 let modules = [];
