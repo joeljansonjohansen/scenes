@@ -1,4 +1,4 @@
-import OSPlayerModule from "./modules/OSPlayerModule.js.js";
+import OSPlayerModule from "../js/modules/OSPlayerModule.js";
 
 let mic;
 let modules = [];
@@ -40,66 +40,35 @@ function setupModules() {
 	//Setup effects
 	let reverb = new Tone.Reverb(5.5, 1.0).toDestination();
 
-	/* let playerModuleTwo = new OSPlayerModule({
-		start: "1:0",
-		length: "10m",
-		loopLength: "2n",
-		fadeOut: "3m",
-		randomFiltering: true,
-		//detune: -1200,
-		randomScattering: true,
-		decay: "2m",
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModuleTwo), 1);
-		},
-	});
-	playerModuleTwo.channel.volume.value = -20;
-	playerModuleTwo.channel.connect(reverb);
-	playerModuleTwo.prepareModule({
-		recordingURL: "./assets/dulcimer.mp3",
-		//recordingURL: "./assets/saxophone-c4.mp3",
-		// recordingURL: "./assets/ravel.mp3",
-		moduleReady: () => {
-			//playerModule.connect(reverb);
-			console.log("Recorder module connected to other module");
-			modules.push(playerModuleTwo);
-		},
-	}); */
-
 	let playerModuleThree = new OSPlayerModule({
 		start: "1:0",
 		length: "15m",
-		loopLength: "1m",
-		interval: "4n",
-		scattering: true,
-		randomDetune: true,
-		//randomFiltering: true,
-		// density: 1.2,
-		loopFadeIn: "4n",
-		loopFadeOut: "4n",
-		detune: -1700,
-		fadeOut: 0.1,
-		// decay: "3m",
-		//randomDelay: true,
-		//totalRandomization: true,
-		reverse: true,
+		interval: "1m",
+		fadeOut: 1.1,
+		decay: "3m",
+		// harmony: [
+		// 	[-2400, -3600, -1200, -500, -300, 0],
+		// 	[-2000, -3200, -800, -100, 100, 400],
+		// ],
+		harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
+		// recordingURL: "../assets/dulcimer.mp3",
+		// recordingURL: "../assets/saxophone-c4.mp3",
+		recordingURL: "../assets/ravel.mp3",
+		regions: {
+			length: "1m",
+			fadeIn: 0.1,
+			fadeOut: 0.1,
+			offset: "random",
+			totalRandomization: true,
+			//randomDetune: false,
+		},
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(playerModuleThree), 1);
 		},
 	});
 	playerModuleThree.channel.connect(reverb);
-	playerModuleThree.prepareModule({
-		// recordingURL: "./assets/dulcimer.mp3",
-		// recordingURL: "./assets/saxophone-c4.mp3",
-		recordingURL: "./assets/ravel.mp3",
-		moduleReady: () => {
-			//playerModule.connect(reverb);
-			console.log("Recorder module connected to other module");
-			modules.push(playerModuleThree);
-		},
-	});
+	modules.push(playerModuleThree);
 }
 
 document

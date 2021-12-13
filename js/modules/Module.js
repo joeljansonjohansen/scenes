@@ -12,8 +12,10 @@ export default class Module {
 				"A module has to have a length. Module will not work as expected."
 			);
 		}
-		this.start = this.valueToSeconds(Tone.Transport.toSeconds(options.start));
-		this.length = this.valueToSeconds(Tone.Transport.toSeconds(options.length));
+		this._start = this.valueToSeconds(Tone.Transport.toSeconds(options.start));
+		this._length = this.valueToSeconds(
+			Tone.Transport.toSeconds(options.length)
+		);
 		this.end = this.start + this.length;
 		// console.log(this.end);
 		// console.log(this.length);
@@ -25,13 +27,6 @@ export default class Module {
 		this._startInMs = this.start * 1000;
 		this._lengthInMs = this.length * 1000;
 		this._progress = 0;
-		// needs to be able to show progress
-		// callback on finished
-		// callback on started
-		// way to stop the module
-
-		// this._dur = 500;
-		// this._timing = 342;
 	}
 	valueToSeconds(value, chosenValue = 0) {
 		return value
@@ -39,16 +34,8 @@ export default class Module {
 			: Tone.Transport.toSeconds(chosenValue);
 	}
 
-	get progress() {
-		return this.progressInMs / this._lengthInMs;
-	}
-
-	get progressInMs() {
-		if (!this._initialTime) {
-			return 0;
-		}
-		let passedTime = Tone.Transport.seconds * 1000 - this._initialTime;
-		return passedTime;
+	toSeconds(time) {
+		return Tone.Transport.toSeconds(time);
 	}
 
 	startModule() {
@@ -93,5 +80,33 @@ export default class Module {
 			y += 20;
 			rect(x, y, w * this.progress, h);
 		}
+	}
+
+	get start() {
+		return this.toSeconds(this._start);
+	}
+
+	set start(value) {
+		this._start = value;
+	}
+
+	get length() {
+		return this.toSeconds(this._length);
+	}
+
+	set length(value) {
+		this._length = value;
+	}
+
+	get progress() {
+		return this.progressInMs / this._lengthInMs;
+	}
+
+	get progressInMs() {
+		if (!this._initialTime) {
+			return 0;
+		}
+		let passedTime = Tone.Transport.seconds * 1000 - this._initialTime;
+		return passedTime;
 	}
 }
