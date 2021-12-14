@@ -50,6 +50,9 @@ export default class Module {
 	async stopModule() {
 		console.log("Waits until ready to stop");
 		this._ended = true;
+		this._initialTime = undefined;
+		this._progress = 0;
+		this._started = false;
 		this.moduleFinished();
 	}
 

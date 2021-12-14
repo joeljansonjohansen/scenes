@@ -43,26 +43,22 @@ function setupModules() {
 	let playerModuleThree = new OSPlayerModule({
 		start: "1:0",
 		length: "5m",
-		interval: "16n",
+		interval: "2n",
 		fadeOut: 1.1,
 		decay: "3m",
+		pitch: "C4",
 		// harmony: [
 		// 	[-2400, -3600, -1200, -500, -300, 0],
 		// 	[-2000, -3200, -800, -100, 100, 400],
 		// ],
 		// harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
-		recordingURL: "../assets/dulcimer.mp3",
-		// recordingURL: "../assets/saxophone-c4.mp3",
+		// recordingURL: "../assets/dulcimer.mp3",
+		recordingURL: "../assets/saxophone-c4.mp3",
 		// recordingURL: "../assets/ravel.mp3",
 		regions: {
-			length: "16n",
-			fadeIn: "32n",
-			fadeOut: 0.1,
-			//scattering: true,
-			// offset: "random",
-			//totalRandomization: true,
-			//randomDetune: false,
-			// randomDelay: false,
+			length: "1m",
+			scattering: true,
+			// totalRandomization: true,
 		},
 		onEnd: () => {
 			console.log("module finished");
@@ -71,6 +67,37 @@ function setupModules() {
 	});
 	playerModuleThree.channel.connect(reverb);
 	modules.push(playerModuleThree);
+
+	// let playerModule = new OSPlayerModule({
+	// 	start: "1:0",
+	// 	length: "5m",
+	// 	interval: "random",
+	// 	fadeOut: 1.1,
+	// 	density: 0.3,
+	// 	decay: "3m",
+	// 	pitch: "C4",
+	// 	detune: -1200,
+	// 	// harmony: [
+	// 	// 	[-2400, -3600, -1200, -500, -300, 0],
+	// 	// 	[-2000, -3200, -800, -100, 100, 400],
+	// 	// ],
+	// 	// harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
+	// 	recordingURL: "../assets/dulcimer.mp3",
+	// 	// recordingURL: "../assets/saxophone-c4.mp3",
+	// 	// recordingURL: "../assets/ravel.mp3",
+	// 	regions: {
+	// 		length: "8n",
+	// 		scattering: true,
+	// 		sourceType: "noise",
+	// 		totalRandomization: true,
+	// 	},
+	// 	onEnd: () => {
+	// 		console.log("module finished");
+	// 		modules.splice(modules.indexOf(playerModule), 1);
+	// 	},
+	// });
+	// playerModule.channel.connect(reverb);
+	// modules.push(playerModule);
 }
 
 document
@@ -93,6 +120,9 @@ document
 document.getElementById("startButton")?.addEventListener("click", () => {
 	setupModules();
 	Tone.Transport.start();
+	// Tone.Transport.loop = true;
+	// Tone.Transport.loopEnd = "4:0";
+	// Tone.Transport.loopStart = "3:0";
 });
 
 window.setup = setup;

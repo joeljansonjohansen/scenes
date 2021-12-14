@@ -32,6 +32,9 @@ export default class OSPlayerModule extends Module {
 		this._channelAmpEnv.releaseCurve = "sine";
 
 		this.regions = new OSRegion(options.regions);
+		this.regions.pitch = this.pitch;
+		this.regions.interval = this.interval;
+		this.regions.detune = this.detune;
 
 		this.currentHarmonyIndex = 0;
 
@@ -61,9 +64,9 @@ export default class OSPlayerModule extends Module {
 				fadeIn: 0,
 				fadeOut: 0.1, //Default fade-out, to avoid click at the end.
 				decay: "3m", //Always setting the decay to 3 measures to let the module ring out.
-				playbackRate: 1,
 				detune: 0,
-				pitch: 0,
+				pitch: "C3", // Default pitch that the oscillators will start from
+				interval: "1m",
 				harmony: undefined,
 			},
 			options
@@ -77,8 +80,12 @@ export default class OSPlayerModule extends Module {
 
 	scheduleEvent(eventTime) {
 		Tone.Transport.scheduleOnce((time) => {
+			// for (let index = 0; index < 4; index++) {
+			// 	//this.regions.detune = index * -100;
+			// }
 			let regionChannel = this.regions.playRegion(time);
 			regionChannel.chain(this._channelAmpEnv, this.channel);
+
 			// if (this.harmony) {
 			// 	for (let pitch of this.harmony[this.currentHarmonyIndex]) {
 			// 		this.regions.detune = pitch;
@@ -183,17 +190,9 @@ export default class OSPlayerModule extends Module {
 
 	get interval() {
 		if (this._interval === "random") {
-			/*
-			 * If we have a densitiy, the interval is based on this.
-			 */
 			return Math.random() * (2 * this.density);
-		} else if (this._interval) {
-			return this.toSeconds(this._interval);
 		} else {
-			/*
-			 *If we don't have either density or interval, return 1 second as interval.
-			 */
-			return 1;
+			return this.toSeconds(this._interval);
 		}
 	}
 

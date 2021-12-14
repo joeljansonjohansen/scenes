@@ -1,13 +1,34 @@
+export function getSource(options) {
+	switch (options.sourceType) {
+		case "osc":
+			return osc(options);
+		case "grainPlayer":
+			return grainPlayer(options);
+		case "player":
+			return player(options);
+		case "noise":
+			return noise(options);
+		case "random":
+			return random(options);
+		default:
+			return osc(options);
+	}
+}
+
+export function random(options) {
+	let array = [grainPlayer, player, osc, noise];
+	return array[floor(Math.random() * array.length)](options);
+}
+
 export function grainPlayer(options) {
 	let source = new Tone.GrainPlayer({
 		loop: false,
 		url: options.buffer,
 		volume: options.volume,
 		detune: options.detune,
-		//playbackRate: map(this.detune, -2400, 0, 0.25, 1),
 		onstop: () => {
-			source.dispose();
 			options.onstop();
+			source.dispose();
 		},
 	});
 	return source;
@@ -18,21 +39,19 @@ export function player(options) {
 		loop: false,
 		url: options.buffer,
 		volume: options.volume,
-		// detune: detune,
-		// playbackrate: map(this.detune, -2400, 0, 0.25, 1),
-		playbackRate: 0.5,
+		playbackRate: Tone.intervalToFrequencyRatio(options.detune / 100),
 		onstop: () => {
-			source.dispose();
 			options.onstop();
+			source.dispose();
 		},
 	});
 	return source;
 }
 
 export function osc(options) {
-	console.log("osc");
 	let source = new Tone.Oscillator({
-		frequency: 100 + Math.random() * 100,
+		frequency: options.pitch,
+		detune: options.detune,
 		type: "sine",
 		volume: -30 + options.volume,
 		onstop: () => {
@@ -44,7 +63,6 @@ export function osc(options) {
 }
 
 export function noise(options) {
-	console.log("noise");
 	let source = new Tone.Noise({
 		frequency: 100 + Math.random() * 100,
 		type: "pink",

@@ -12,6 +12,7 @@ export default class OSRegion {
 		Object.assign(
 			this,
 			{
+				sourceType: undefined,
 				offset: 0,
 				length: 0,
 				fadeIn: 0,
@@ -46,18 +47,21 @@ export default class OSRegion {
 		 * dispose the effects and the player in the onStop.
 		 */
 
-		let source = OSSource.noise({
+		let source = OSSource.getSource({
+			sourceType: this.sourceType,
 			buffer: this.buffer,
 			volume: this.volume,
 			detune: this.detune,
+			pitch: this.pitch,
 			onstop: () => {
 				currentEffects.forEach((effect) => {
 					effect.dispose();
-					console.log("disposes effect");
+					//console.log("disposes effect");
 				});
 				currentEnvelope.dispose();
 			},
 		});
+		//console.log(source);
 
 		source.start(time, this.offset);
 		currentEnvelope.triggerAttack(time);
@@ -150,7 +154,11 @@ export default class OSRegion {
 	}
 
 	get length() {
-		return Tone.Transport.toSeconds(this._length);
+		if (!this.buffer) {
+			return Tone.Transport.toSeconds(this.interval);
+		} else {
+			return Tone.Transport.toSeconds(this._length);
+		}
 	}
 
 	set length(value) {
@@ -167,7 +175,7 @@ export default class OSRegion {
 
 	get detune() {
 		if (this.randomDetune) {
-			return this._detune + (-50 + Math.random() * 50);
+			return this._detune + (-25 + Math.random() * 25);
 		} else {
 			return this._detune;
 		}
@@ -175,17 +183,18 @@ export default class OSRegion {
 
 	set buffer(val) {
 		this._buffer = val;
+		if (!this.sourceType) {
+			this.sourceType = "grainPlayer";
+		}
 		this.length = this.length === 0 ? this._buffer.duration : this.length;
 	}
 
 	set reversedBuffer(val) {
 		this._reversedBuffer = val;
-		this.length =
-			this.length === 0 ? this._reversedBuffer.duration : this.length;
 	}
 
 	get buffer() {
-		if (this.randomReversing && Math.random() > 0.5) {
+		if ((this.randomReversing && Math.random() > 0.5) || this.reverse) {
 			return this._reversedBuffer;
 		} else {
 			return this._buffer;
