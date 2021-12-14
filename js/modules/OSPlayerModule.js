@@ -59,10 +59,8 @@ export default class OSPlayerModule extends Module {
 				title: "OSPlayer",
 				density: 0.5,
 				fadeIn: 0,
-				fadeOut: 0,
+				fadeOut: 0.1, //Default fade-out, to avoid click at the end.
 				decay: "3m", //Always setting the decay to 3 measures to let the module ring out.
-				totalRandomization: false,
-				randomDetune: false,
 				playbackRate: 1,
 				detune: 0,
 				pitch: 0,
@@ -203,6 +201,6 @@ export default class OSPlayerModule extends Module {
 		Tone.Transport.scheduleOnce((time) => {
 			this.buffer.dispose();
 			this.regions.dispose();
-		}, "+" + this.decay);
+		}, "+" + this.decay + 0.1);
 	}
 }

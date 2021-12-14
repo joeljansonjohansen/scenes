@@ -1,3 +1,5 @@
+import * as OSSource from "./OSSource.js";
+
 export default class OSRegion {
 	constructor(options) {
 		this.getDefaults(options);
@@ -13,8 +15,9 @@ export default class OSRegion {
 				offset: 0,
 				length: 0,
 				fadeIn: 0,
-				fadeOut: 0,
+				fadeOut: 0.05, //Setting default fade to avoid clicks
 				detune: 0,
+				volume: 0,
 				reverse: false,
 				scattering: false,
 				randomFiltering: false,
@@ -43,12 +46,24 @@ export default class OSRegion {
 		 * dispose the effects and the player in the onStop.
 		 */
 
-		let source = this.createSource(currentEffects, currentEnvelope);
+		let source = OSSource.noise({
+			buffer: this.buffer,
+			volume: this.volume,
+			detune: this.detune,
+			onstop: () => {
+				currentEffects.forEach((effect) => {
+					effect.dispose();
+					console.log("disposes effect");
+				});
+				currentEnvelope.dispose();
+			},
+		});
 
 		source.start(time, this.offset);
 		currentEnvelope.triggerAttack(time);
 		source.stop(time + this.length + 0.1);
 		currentEnvelope.triggerRelease(time + this.length - this.fadeOut);
+
 		if (currentDelay) {
 			source.chain(
 				currentEnvelope,
@@ -62,60 +77,6 @@ export default class OSRegion {
 		this._activeSources.push(source);
 		//console.log("in the start: ", this._activeSources);
 		return this._channel;
-	}
-
-	createSource(currentEffects, currentEnvelope) {
-		//Left here is to implement different sources.
-		let source = new Tone.GrainPlayer({
-			loop: false,
-			url: this.buffer,
-			volume: this.volume,
-			detune: this.detune,
-			//playbackRate: map(this.detune, -2400, 0, 0.25, 1),
-			onstop: () => {
-				currentEffects?.forEach((effect) => {
-					effect.dispose();
-					console.log("disposes effect");
-				});
-				source?.dispose();
-				currentEnvelope?.dispose();
-			},
-		});
-		return source;
-		// let source;
-		// if (Math.random() > 0.0) {
-		// 	source = new Tone.GrainPlayer({
-		// 		loop: false,
-		// 		url: this.buffer,
-		// 		volume: this.volume,
-		// 		detune: this.detune,
-		// 		onstop: () => {
-		// 			source?.dispose();
-		// 			currentEnvelope?.dispose();
-		// 			currentEffects?.forEach((effect) => {
-		// 				if (!this._delays?.includes(effect)) {
-		// 					effect?.dispose();
-		// 				}
-		// 			});
-		// 		},
-		// 	});
-		// } else {
-		// 	source = new Tone.Oscillator({
-		// 		frequency: 100 + Math.random() * 100,
-		// 		type: "sine",
-		// 		volume: -30 + this.volume,
-		// 		onstop: () => {
-		// 			source?.dispose();
-		// 			currentEnvelope?.dispose();
-		// 			currentEffects?.forEach((effect) => {
-		// 				if (!this._delays?.includes(effect)) {
-		// 					effect?.dispose();
-		// 				}
-		// 			});
-		// 		},
-		// 	});
-		// }
-		// return source;
 	}
 
 	checkFinishedSources() {
@@ -243,6 +204,32 @@ export default class OSRegion {
 				: randomOffset;
 		} else {
 			return Tone.Transport.toSeconds(this._offset);
+		}
+	}
+
+	set fadeIn(val) {
+		this._fadeIn = val;
+	}
+
+	get fadeIn() {
+		if (this._fadeIn === "random") {
+			let randomFadeIn = 0.05 + Math.random() * (this.length / 2);
+			return randomFadeIn;
+		} else {
+			return Tone.Transport.toSeconds(this._fadeIn);
+		}
+	}
+
+	set fadeOut(val) {
+		this._fadeOut = val;
+	}
+
+	get fadeOut() {
+		if (this._fadeOut === "random") {
+			let randomFadeOut = 0.05 + Math.random() * (this.length / 2);
+			return randomFadeOut;
+		} else {
+			return Tone.Transport.toSeconds(this._fadeOut);
 		}
 	}
 

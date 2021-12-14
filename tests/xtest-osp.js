@@ -42,25 +42,27 @@ function setupModules() {
 
 	let playerModuleThree = new OSPlayerModule({
 		start: "1:0",
-		length: "15m",
-		interval: "1m",
+		length: "5m",
+		interval: "16n",
 		fadeOut: 1.1,
 		decay: "3m",
 		// harmony: [
 		// 	[-2400, -3600, -1200, -500, -300, 0],
 		// 	[-2000, -3200, -800, -100, 100, 400],
 		// ],
-		harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
-		// recordingURL: "../assets/dulcimer.mp3",
+		// harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
+		recordingURL: "../assets/dulcimer.mp3",
 		// recordingURL: "../assets/saxophone-c4.mp3",
-		recordingURL: "../assets/ravel.mp3",
+		// recordingURL: "../assets/ravel.mp3",
 		regions: {
-			length: "1m",
-			fadeIn: 0.1,
+			length: "16n",
+			fadeIn: "32n",
 			fadeOut: 0.1,
-			offset: "random",
-			totalRandomization: true,
+			//scattering: true,
+			// offset: "random",
+			//totalRandomization: true,
 			//randomDetune: false,
+			// randomDelay: false,
 		},
 		onEnd: () => {
 			console.log("module finished");
