@@ -65,9 +65,11 @@ export default class Module {
 
 	update(passedTime) {
 		if (passedTime >= this._startInMs && !this._started) {
+			console.log("starts module");
 			this.startModule();
 		}
 		if (this.progress >= 1 && !this._ended) {
+			console.log("ends module");
 			this.stopModule();
 		}
 	}

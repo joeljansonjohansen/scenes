@@ -11,8 +11,8 @@ function setup() {
 }
 
 function draw() {
-	//let density = map(mouseY, 0, windowHeight, 0.5, 3.2);
-	let detune = map(mouseX, 0, windowWidth, 700, -2400);
+	// let density = map(mouseY, 0, windowHeight, 0.1, 3.2);
+	// let detune = map(mouseX, 0, windowWidth, 700, -2400);
 	// console.log(density);
 	background(244);
 	let tonePos = Tone.Transport.position.split(":");
@@ -43,7 +43,8 @@ function setupModules() {
 	let playerModuleThree = new OSPlayerModule({
 		start: "1:0",
 		length: "5m",
-		interval: "2n",
+		interval: "4n",
+		//density: 0.8,
 		fadeOut: 1.1,
 		decay: "3m",
 		pitch: "C4",
@@ -53,12 +54,15 @@ function setupModules() {
 		// ],
 		// harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
 		// recordingURL: "../assets/dulcimer.mp3",
-		recordingURL: "../assets/saxophone-c4.mp3",
-		// recordingURL: "../assets/ravel.mp3",
+		// recordingURL: "../assets/saxophone-c4.mp3",
+		recordingURL: "../assets/ravel.mp3",
+		// detune: -2400,
 		regions: {
 			length: "1m",
 			scattering: true,
-			// totalRandomization: true,
+			totalRandomization: true,
+			fadeIn: "4n",
+			// randomDetune: true,
 		},
 		onEnd: () => {
 			console.log("module finished");
@@ -123,6 +127,13 @@ document.getElementById("startButton")?.addEventListener("click", () => {
 	// Tone.Transport.loop = true;
 	// Tone.Transport.loopEnd = "4:0";
 	// Tone.Transport.loopStart = "3:0";
+	// let count = 0;
+	// Tone.Transport.scheduleRepeat((time) => {
+	// 	if (count > 4) {
+	// 		Tone.Transport.loop = false;
+	// 	}
+	// 	count++;
+	// }, "1m");
 });
 
 window.setup = setup;

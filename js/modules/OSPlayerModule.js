@@ -34,7 +34,7 @@ export default class OSPlayerModule extends Module {
 		this.regions = new OSRegion(options.regions);
 		this.regions.pitch = this.pitch;
 		this.regions.interval = this.interval;
-		this.regions.detune = this.detune;
+		//this.regions.detune = this.detune;
 
 		this.currentHarmonyIndex = 0;
 
@@ -45,12 +45,14 @@ export default class OSPlayerModule extends Module {
 		 * And functions as a way to let the module finish.
 		 */
 
+		//For looping functionality use "schedule instead".
 		Tone.Transport.scheduleOnce((time) => {
 			this._channelAmpEnv.triggerAttack(time);
-			this._channelAmpEnv.triggerRelease(
-				time + (this.length - this.fadeOut) + this.decay
-			);
 		}, this.start);
+
+		Tone.Transport.scheduleOnce((time) => {
+			this._channelAmpEnv.triggerRelease(time);
+		}, this.end - this.fadeOut + this.decay);
 
 		this.scheduleEvent(this.start);
 	}
@@ -67,6 +69,7 @@ export default class OSPlayerModule extends Module {
 				detune: 0,
 				pitch: "C3", // Default pitch that the oscillators will start from
 				interval: "1m",
+				//loopPlaybackRate: 1,
 				harmony: undefined,
 			},
 			options
@@ -79,41 +82,22 @@ export default class OSPlayerModule extends Module {
 	}
 
 	scheduleEvent(eventTime) {
-		Tone.Transport.scheduleOnce((time) => {
+		this._loop = new Tone.Loop((time) => {
 			// for (let index = 0; index < 4; index++) {
-			// 	//this.regions.detune = index * -100;
+			// 	this.regions.detune = this.detune + index * -300;
+			// 	let regionChannel = this.regions.playRegion(time);
+			// 	regionChannel.chain(this._channelAmpEnv, this.channel);
 			// }
 			let regionChannel = this.regions.playRegion(time);
 			regionChannel.chain(this._channelAmpEnv, this.channel);
+			this._loop.playbackRate = this.loopPlaybackRate;
+		}, this.interval);
+		this._loop.start(eventTime).stop(this.end);
 
-			// if (this.harmony) {
-			// 	for (let pitch of this.harmony[this.currentHarmonyIndex]) {
-			// 		this.regions.detune = pitch;
-			// 		console.log(pitch);
-			// 		let regionChannel = this.regions.playRegion(time);
-			// 		regionChannel.chain(this._channelAmpEnv, this.channel);
-			// 	}
-			// 	this.currentHarmonyIndex =
-			// 		this.currentHarmonyIndex < this.harmony.length - 1
-			// 			? this.currentHarmonyIndex + 1
-			// 			: 0;
-			// 	console.log("this.currentHarmonyIndex: ", this.currentHarmonyIndex);
-			// } else {
-			// let regionChannel = this.regions.playRegion(time);
-			// regionChannel.chain(this._channelAmpEnv, this.channel);
-			// }
-		}, eventTime);
-
-		/*
-		 * If we have a measured time, as a fixed value, quarter note or so. We take that value.
-		 * Otherwise we randomize a time based on the density that has been set before.
-		 * Then we schedule it if it's inside of the modules timeframe.
-		 */
-		let nextTime = eventTime + this.interval;
-		//console.log(nextTime);
-		if (nextTime < this.end) {
-			this.scheduleEvent(nextTime);
-		}
+		let testloop = new Tone.Loop((time) => {
+			console.log(Tone.Transport.position);
+		}, this.interval);
+		testloop.start(eventTime);
 	}
 	/*
 	 * We should keep track of all the event-IDs and cancel here if the module is stopped.
@@ -188,15 +172,29 @@ export default class OSPlayerModule extends Module {
 		this._interval = val;
 	}
 
+	set density(val) {
+		this._density = val;
+	}
+
 	get interval() {
 		if (this._interval === "random") {
-			return Math.random() * (2 * this.density);
+			return 4;
 		} else {
 			return this.toSeconds(this._interval);
 		}
 	}
 
+	get loopPlaybackRate() {
+		if (this._interval === "random") {
+			//TODO: This needs a better algoritm
+			return this._density + Math.random() * this._density;
+		} else {
+			return 1;
+		}
+	}
+
 	dispose() {
+		console.log("disposes OSPlayerModule");
 		Tone.Transport.scheduleOnce((time) => {
 			this.buffer.dispose();
 			this.regions.dispose();
