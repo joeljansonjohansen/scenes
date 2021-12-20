@@ -2,15 +2,21 @@ import Parameter from '../js/modules/Parameter.js';
 
 class TestModule {
   constructor() {
-    this.freq = new Parameter('freq', 440, 20, 20000, (param) => {
-      // do something with the parameter value here
-      console.log(param.name + ' changed: ' + param.value);
-    });
     this.amp = new Parameter('amp', 0, 0, 1, (param) => {
       // do something with the parameter value here
       console.log(param.name + ' changed: ' + param.value);
     });
+
+    // bind 'this' to maintain scope
+    this.onFreqChanged = this.onFreqChanged.bind(this);
+    this.freq = new Parameter('freq', 440, 20, 20000, this.onFreqChanged);
+
+    // register parameters
     this._params = [this.freq, this.amp];
+  }
+
+  onFreqChanged(param) {
+    console.log(param.name + ' changed: ' + param.value);
   }
 
   /**
