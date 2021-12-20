@@ -1,12 +1,13 @@
 export default class Parameter {
-  constructor(name, defaultValue, min, max) {
+  constructor(name, defaultValue, min, max, onChange) {
     this._name = name;
     this._value = defaultValue;
     this._min = min;
     this._max = max;
     this.listeners = [];
 
-    this.value = this.unmap(defaultValue);
+    this._value = this.unmap(defaultValue);
+    this._onChange = onChange;
   }
 
   addListener(listener) {
@@ -19,6 +20,14 @@ export default class Parameter {
 
   unmap(value) {
     return (value - this._min) / (this._max - this._min);
+  }
+
+  /**
+   * @brief Get the parameter name.
+   * @return The name.
+   */
+  get name() {
+    return this._name;
   }
 
   /**
@@ -37,6 +46,11 @@ export default class Parameter {
     return this._value;
   }
 
+  /**
+   * @brief Set the value.
+   * @param val The value to set, normalized to 0 - 1.
+   * @note The input value will be clipped if it exceeds the normalized range.
+   */
   set value(val) {
     if (val === undefined || val === null) {
       return;
@@ -47,6 +61,9 @@ export default class Parameter {
       val = 0.0;
     }
     this._value = val;
+    if (this._onChange) {
+      this._onChange(this);
+    }
     this.listeners.forEach(listener => {
       listener.update(this);
     });
