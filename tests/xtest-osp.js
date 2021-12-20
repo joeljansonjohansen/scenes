@@ -43,9 +43,9 @@ function setupModules() {
 
 	let processingModule = new ProcessingModule({
 		start: "1:0",
-		length: "1m",
-		fadeIn: "4n",
-		fadeOut: "4n",
+		length: "4m",
+		fadeIn: "1m",
+		fadeOut: "1m",
 		input: mic,
 		onEnd: () => {
 			console.log("module finished");
@@ -55,7 +55,7 @@ function setupModules() {
 	processingModule.channel.connect(reverb);
 	modules.push(processingModule);
 
-	/* let playerModuleThree = new PlayerModule({
+	let playerModuleThree = new PlayerModule({
 		start: "1:0",
 		length: "5m",
 		interval: "4n",
@@ -85,7 +85,7 @@ function setupModules() {
 		},
 	});
 	playerModuleThree.channel.connect(reverb);
-	modules.push(playerModuleThree); */
+	modules.push(playerModuleThree);
 
 	// let playerModule = new PlayerModule({
 	// 	start: "1:0",

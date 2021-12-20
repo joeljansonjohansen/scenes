@@ -3,13 +3,13 @@ import Module from "./Module.js";
 export default class RecorderModule extends Module {
 	constructor(options) {
 		super(options);
-		if (!options.mic) {
-			console.error("has no access to mic");
+		if (!options.input) {
+			console.error("has no access to input");
 			this.moduleFinished();
 		} else {
 			this.recorder = new Tone.Recorder();
-			this.mic = options.mic;
-			this.mic.connect(this.recorder);
+			this.input = options.input;
+			this.input.connect(this.recorder);
 		}
 	}
 
