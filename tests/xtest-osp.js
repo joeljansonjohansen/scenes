@@ -1,4 +1,5 @@
-import OSPlayerModule from "../js/modules/OSPlayerModule.js";
+import PlayerModule from "../js/modules/PlayerModule.js";
+import ProcessingModule from "../js/modules/ProcessingModule.js";
 
 let mic;
 let modules = [];
@@ -40,7 +41,21 @@ function setupModules() {
 	//Setup effects
 	let reverb = new Tone.Reverb(5.5, 1.0).toDestination();
 
-	let playerModuleThree = new OSPlayerModule({
+	let processingModule = new ProcessingModule({
+		start: "1:0",
+		length: "1m",
+		fadeIn: "4n",
+		fadeOut: "4n",
+		input: mic,
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(processingModule), 1);
+		},
+	});
+	processingModule.channel.connect(reverb);
+	modules.push(processingModule);
+
+	/* let playerModuleThree = new PlayerModule({
 		start: "1:0",
 		length: "5m",
 		interval: "4n",
@@ -70,9 +85,9 @@ function setupModules() {
 		},
 	});
 	playerModuleThree.channel.connect(reverb);
-	modules.push(playerModuleThree);
+	modules.push(playerModuleThree); */
 
-	// let playerModule = new OSPlayerModule({
+	// let playerModule = new PlayerModule({
 	// 	start: "1:0",
 	// 	length: "5m",
 	// 	interval: "random",

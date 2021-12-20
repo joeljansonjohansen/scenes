@@ -1,7 +1,7 @@
 export default class Module {
 	constructor(options) {
 		//Public
-		this.title = options.title ?? "Module";
+		this.getDefaults(options);
 		if (options.start === undefined) {
 			console.error(
 				"A module has to have a start time. Module will not work as expected."
@@ -28,6 +28,17 @@ export default class Module {
 		this._lengthInMs = this.length * 1000;
 		this._progress = 0;
 	}
+
+	getDefaults(options) {
+		Object.assign(
+			this,
+			{
+				title: "Module",
+			},
+			options
+		);
+	}
+
 	valueToSeconds(value, chosenValue = 0) {
 		return value
 			? Tone.Transport.toSeconds(value)

@@ -1,4 +1,4 @@
-import * as OSSource from "./OSSource.js";
+import * as Source from "./Source.js";
 
 export default class OSRegion {
 	constructor(options) {
@@ -47,7 +47,7 @@ export default class OSRegion {
 		 * dispose the effects and the player in the onStop.
 		 */
 
-		let source = OSSource.getSource({
+		let source = Source.getSource({
 			sourceType: this.sourceType,
 			buffer: this.buffer,
 			volume: this.volume,

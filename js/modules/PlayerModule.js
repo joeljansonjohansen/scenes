@@ -1,58 +1,20 @@
-import Module from "./Module.js";
-import OSRegion from "./OSRegion.js";
+import AudioModule from "./AudioModule.js";
+import Region from "./Region.js";
 
 /* 
-    The OSPlayerModule can play audio files and does so for a ceratain amount of time
+    The PlayerModule can play audio files and does so for a ceratain amount of time
     that you define by setting length. If length is not set, then length is 0 until
     the player gets a buffer - ??
     */
 
-export default class OSPlayerModule extends Module {
+export default class PlayerModule extends AudioModule {
 	constructor(options) {
 		super(options);
 		this.getDefaults(options);
-		/*
-		 * The channel connected to the module.
-		 */
-		this.channel = new Tone.Volume().toDestination();
 
-		/*
-		 * This is the envelope for the entire module.
-		 * The envelope is used to be able to have a separate volume control.
-		 * Could also just use a volume? But this might have its perks.
-		 */
-		// this.decay = this.valueToSeconds(options.decay);
-		this._channelAmpEnv = new Tone.AmplitudeEnvelope({
-			attack: this.fadeIn,
-			decay: 0.1,
-			sustain: 1,
-			release: this.fadeOut,
-		});
-		this._channelAmpEnv.attackCurve = "sine";
-		this._channelAmpEnv.releaseCurve = "sine";
-
-		this.regions = new OSRegion(options.regions);
+		this.regions = new Region(options.regions);
 		this.regions.pitch = this.pitch;
 		this.regions.interval = this.interval;
-		//this.regions.detune = this.detune;
-
-		this.currentHarmonyIndex = 0;
-
-		/*
-		 * Schedule all of the modules events in the constructor.
-		 * There is a variable called decay. This is only used
-		 * here, when the release of the envelope is triggered.
-		 * And functions as a way to let the module finish.
-		 */
-
-		//For looping functionality use "schedule instead".
-		Tone.Transport.scheduleOnce((time) => {
-			this._channelAmpEnv.triggerAttack(time);
-		}, this.start);
-
-		Tone.Transport.scheduleOnce((time) => {
-			this._channelAmpEnv.triggerRelease(time);
-		}, this.end - this.fadeOut + this.decay);
 
 		this.scheduleEvent(this.start);
 	}
@@ -82,6 +44,18 @@ export default class OSPlayerModule extends Module {
 	}
 
 	scheduleEvent(eventTime) {
+		//Implement interval-array like this kindof:
+		/* let iter = 0;
+		let array = ["1m", "4n", "8n", "2n", "1m", "16n"];
+		const loop = new Tone.Loop((time) => {
+			// triggered every eighth note.
+			console.log(time);
+			loop.interval = array[iter];
+			iter++;
+			iter = iter % array.length;
+		}).start(0);
+		Tone.Transport.start(); */
+
 		this._loop = new Tone.Loop((time) => {
 			// for (let index = 0; index < 4; index++) {
 			// 	this.regions.detune = this.detune + index * -300;
@@ -94,10 +68,10 @@ export default class OSPlayerModule extends Module {
 		}, this.interval);
 		this._loop.start(eventTime).stop(this.end);
 
-		let testloop = new Tone.Loop((time) => {
-			console.log(Tone.Transport.position);
-		}, this.interval);
-		testloop.start(eventTime);
+		// let testloop = new Tone.Loop((time) => {
+		// 	console.log(Tone.Transport.position);
+		// }, this.interval);
+		// testloop.start(eventTime);
 	}
 	/*
 	 * We should keep track of all the event-IDs and cancel here if the module is stopped.
@@ -144,30 +118,6 @@ export default class OSPlayerModule extends Module {
 		});
 	}
 
-	set fadeIn(val) {
-		this._fadeIn = val;
-	}
-
-	get fadeIn() {
-		return this.toSeconds(this._fadeIn);
-	}
-
-	set fadeOut(val) {
-		this._fadeOut = val;
-	}
-
-	get fadeOut() {
-		return this.toSeconds(this._fadeOut);
-	}
-
-	set decay(val) {
-		this._decay = val;
-	}
-
-	get decay() {
-		return this.toSeconds(this._decay);
-	}
-
 	set interval(val) {
 		this._interval = val;
 	}
@@ -194,10 +144,10 @@ export default class OSPlayerModule extends Module {
 	}
 
 	dispose() {
-		console.log("disposes OSPlayerModule");
+		console.log("disposes PlayerModule");
 		Tone.Transport.scheduleOnce((time) => {
 			this.buffer.dispose();
 			this.regions.dispose();
-		}, "+" + this.decay + 0.1);
+		}, "+" + (this.decay + 0.1));
 	}
 }
