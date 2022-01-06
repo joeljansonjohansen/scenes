@@ -1,5 +1,5 @@
 import AudioModule from "./AudioModule.js";
-import Region from "./Region.js";
+import Region from "../sources/Region.js";
 
 /* 
     The PlayerModule can play audio files and does so for a ceratain amount of time
@@ -33,6 +33,7 @@ export default class PlayerModule extends AudioModule {
 				interval: "1m",
 				//loopPlaybackRate: 1,
 				harmony: undefined,
+				lpbrSignal: 1,
 			},
 			options
 		);
@@ -64,6 +65,8 @@ export default class PlayerModule extends AudioModule {
 			// }
 			let regionChannel = this.regions.playRegion(time);
 			regionChannel.chain(this._channelAmpEnv, this.channel);
+			console.log(this._loop.playbackRate);
+
 			this._loop.playbackRate = this.loopPlaybackRate;
 		}, this.interval);
 		this._loop.start(eventTime).stop(this.end);
@@ -73,6 +76,7 @@ export default class PlayerModule extends AudioModule {
 		// }, this.interval);
 		// testloop.start(eventTime);
 	}
+
 	/*
 	 * We should keep track of all the event-IDs and cancel here if the module is stopped.
 	 */
@@ -143,11 +147,19 @@ export default class PlayerModule extends AudioModule {
 		}
 	}
 
+	set lpbrSignal(val) {
+		this._lpbrSignal = new Tone.Signal(val);
+	}
+
+	get lpbrSignal() {
+		return this._lpbrSignal;
+	}
+
 	dispose() {
 		console.log("disposes PlayerModule");
 		Tone.Transport.scheduleOnce((time) => {
-			this.buffer.dispose();
-			this.regions.dispose();
+			this.buffer?.dispose();
+			this.regions?.dispose();
 		}, "+" + (this.decay + 0.1));
 	}
 }

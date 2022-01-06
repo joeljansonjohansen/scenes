@@ -22,11 +22,6 @@ export default class Module {
 
 		//Private
 		this._onEnd = options.onEnd;
-		this._started = false;
-		this._ended = false;
-		this._startInMs = this.start * 1000;
-		this._lengthInMs = this.length * 1000;
-		this._progress = 0;
 	}
 
 	getDefaults(options) {
@@ -34,6 +29,9 @@ export default class Module {
 			this,
 			{
 				title: "Module",
+				_started: false,
+				_ended: false,
+				_progress: 0,
 			},
 			options
 		);
@@ -50,7 +48,7 @@ export default class Module {
 	}
 
 	startModule() {
-		this._initialTime = Tone.Transport.seconds * 1000;
+		this._initialTime = Tone.Transport.seconds;
 		console.log("Module started, do we need a callback?");
 		this._started = true;
 	}
@@ -75,7 +73,7 @@ export default class Module {
 	}
 
 	update(passedTime) {
-		if (passedTime >= this._startInMs && !this._started) {
+		if (passedTime >= this.start && !this._started) {
 			console.log("starts module");
 			this.startModule();
 		}
@@ -115,14 +113,10 @@ export default class Module {
 	}
 
 	get progress() {
-		return this.progressInMs / this._lengthInMs;
-	}
-
-	get progressInMs() {
 		if (!this._initialTime) {
 			return 0;
 		}
-		let passedTime = Tone.Transport.seconds * 1000 - this._initialTime;
-		return passedTime;
+		let passedTime = Tone.Transport.seconds - this._initialTime;
+		return passedTime / this.length;
 	}
 }

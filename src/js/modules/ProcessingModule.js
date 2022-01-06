@@ -15,7 +15,15 @@ export default class ProcessingModule extends AudioModule {
 			console.error("has no input");
 			this.moduleFinished();
 		} else {
-			this.scheduleEvent(this.start);
+			//this.scheduleEvent(this.start);
+			/* setTimeout(() => {
+				this.setup();
+				this.input.chain(
+					...this.processingUnits,
+					this._channelAmpEnv,
+					this.channel
+				);
+			}, 50); */
 		}
 	}
 
@@ -25,19 +33,24 @@ export default class ProcessingModule extends AudioModule {
 			{
 				title: "ProcessingModule",
 				decay: 0,
+				setup: () => {
+					console.log(
+						"Setup must be sent into the processing module, every effect should be added to this.processingUnits."
+					);
+					/**
+					 * const filter = new Tone.Filter(5000, "lowpass");
+					 * let ps = new Tone.PitchShift(-12);
+					 * this.processingUnits.push(filter);
+					 * this.processingUnits.push(ps);
+					 */
+				},
 			},
 			options
 		);
 	}
 
 	scheduleEvent(eventTime) {
-		Tone.Transport.scheduleOnce((time) => {
-			const filter = new Tone.Filter(5000, "lowpass");
-			let ps = new Tone.PitchShift(-12);
-			this.processingUnits.push(filter);
-			this.processingUnits.push(ps);
-			this.input.chain(ps, filter, this._channelAmpEnv, this.channel);
-		}, eventTime);
+		Tone.Transport.scheduleOnce((time) => {}, eventTime);
 	}
 	/*
 	 * We should keep track of all the event-IDs and cancel here if the module is stopped.
