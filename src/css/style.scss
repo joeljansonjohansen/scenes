@@ -1,8 +1,9 @@
+@import "./variables.scss";
 html,
 body {
 	margin: 0;
 	padding: 0;
-	background-color: rgb(65, 65, 65);
+	background-color: $background-color;
 }
 canvas {
 	display: block;

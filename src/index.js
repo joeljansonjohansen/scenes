@@ -1,2 +1,2 @@
 import { start } from "./app.js";
-import css from "./css/style.css";
+import css from "./css/main.scss";
