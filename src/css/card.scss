@@ -1,0 +1,104 @@
+@import "./variables.scss";
+
+#content-holder {
+}
+
+.card-w {
+	width: 320px;
+	min-width: 320px;
+	max-width: 320px;
+}
+
+#title-card {
+	margin: 44px;
+	div {
+		margin-bottom: -1px;
+	}
+	:last-child {
+		margin-bottom: 0;
+	}
+}
+
+#main-title {
+	font-family: Elgoc, Georgia, "Times New Roman", Times, serif;
+	letter-spacing: 0.5em;
+}
+
+#info,
+#instrument {
+	font-family: Lato, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	letter-spacing: 0.4em;
+}
+
+#written {
+	font-family: Forum, Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	letter-spacing: 0.4em;
+}
+
+#information-holder {
+	margin-bottom: 44px;
+	& h2 {
+		font-family: Forum, Georgia, "Times New Roman", Times, serif;
+		font-size: 24px;
+		margin-bottom: 10px;
+	}
+	& p {
+		font-family: Lato, Arial, Helvetica, sans-serif;
+		font-size: 14px;
+		line-height: 24px;
+	}
+}
+
+.uc {
+	text-transform: uppercase;
+}
+
+.p-05 {
+	padding-left: 0.5em;
+	padding-top: 0.12em;
+}
+
+.p-04 {
+	padding-left: 0.4em;
+}
+
+.d-flex {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	text-align: center;
+}
+
+.w-1 {
+	width: 100%;
+}
+
+.w-2 {
+	width: 50%;
+}
+.w-3 {
+	width: 33%;
+}
+
+.holder {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	text-align: center;
+}
+
+.rounded-rect {
+	height: 90px;
+	line-height: 45px;
+	font-size: 15px;
+	border-radius: 45px;
+	border: 1px solid $complementary-color;
+	&-small {
+		height: 45px;
+		line-height: 45px;
+		border-radius: 22px;
+		border: 1px solid $complementary-color;
+	}
+}

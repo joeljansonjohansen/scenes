@@ -5,8 +5,45 @@
 		<meta charset="utf-8" />
 	</head>
 	<body>
-		<button id="startButton">Start audio</button>
-		<button id="getMicrophoneAccess">Get microphone access</button>
-		<div>HEJ</div>
+		<main id="main">
+			<div id="content-holder" class="d-flex holder">
+				<div id="title-card" class="d-flex holder card-w">
+					<div id="main-title" class="d-flex w-1 rounded-rect">
+						<h1 class="p-05 uc">INFINITE<br />LEISURE</h1>
+						<!-- <h1 class="p-05 uc">What you give is what you get</h1> -->
+					</div>
+					<div id="info" class="d-flex w-1">
+						<p class="p-04 w-2 rounded-rect-small uc">DURATION</p>
+						<p class="p-04 w-2 rounded-rect-small uc">CIRCA 4'</p>
+					</div>
+					<div id="instrument" class="d-flex w-1">
+						<p class="p-04 w-1 rounded-rect-small uc">
+							Saxophone & Electronics
+						</p>
+					</div>
+					<div id="written" class="d-flex w-1">
+						<p class="p-04 w-1 rounded-rect-small uc">Written 2021-22</p>
+					</div>
+				</div>
+			</div>
+			<div id="information-holder" class="d-flex holder">
+				<div class="card-w">
+					<h2 class="w-1">Before we start</h2>
+					<p>
+						Make sure you have the score.<br /><br />Before the piece can start,
+						you have to accept the browser to use the microphone. Click the
+						button below
+					</p>
+				</div>
+			</div>
+			<div id="permissions" class="d-flex holder">
+				<button id="startButton" class="card-w rounded-rect-small uc">
+					Start audio
+				</button>
+				<button id="getMicrophoneAccess" class="card-w rounded-rect-small uc">
+					Grant permission
+				</button>
+			</div>
+		</main>
 	</body>
 </html>

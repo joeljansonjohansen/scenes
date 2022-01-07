@@ -19,7 +19,7 @@ module.exports = {
 				use: ["html-loader"],
 			},
 			{
-				test: /\.(mp3|wav|m4a)$/i,
+				test: /\.(mp3|wav|m4a|otf|ttf)$/i,
 				use: {
 					loader: "file-loader",
 					options: {

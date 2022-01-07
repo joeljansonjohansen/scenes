@@ -1,0 +1,20 @@
+@import "./variables.scss";
+
+button {
+	background-color: $background-color;
+	color: $complementary-color;
+	font-family: Forum, Georgia, "Times New Roman", Times, serif;
+	font-weight: bold;
+	font-size: 15px;
+	line-height: 45px;
+	height: 45px;
+	margin: 10px 0px;
+	&:active {
+		background-color: $complementary-color;
+		color: $background-color;
+	}
+}
+
+#startButton {
+	display: none;
+}

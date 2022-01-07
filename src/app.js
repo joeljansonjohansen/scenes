@@ -12,7 +12,8 @@ let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
 
 function setup() {
-	createCanvas(400, 400);
+	let canvas = createCanvas(400, 400);
+	//canvas.parent("main");
 	background(244);
 	textFont("Helvetica");
 	Tone.Transport.bpm.value = 120;
@@ -165,6 +166,8 @@ document
 	.getElementById("getMicrophoneAccess")
 	?.addEventListener("click", async () => {
 		await permissions.getPermissions();
+		document.getElementById("getMicrophoneAccess").style.display = "none";
+		document.getElementById("startButton").style.display = "block";
 	});
 
 document.getElementById("startButton")?.addEventListener("click", () => {
