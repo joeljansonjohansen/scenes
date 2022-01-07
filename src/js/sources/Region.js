@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 import * as Source from "./Source.js";
 
 export default class OSRegion {

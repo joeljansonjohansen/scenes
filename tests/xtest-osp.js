@@ -79,20 +79,23 @@ function setupModules() {
 		},
 	});
 	playerModuleClick.channel.connect(reverb);
-	modules.push(playerModuleClick); */
+	modules.push(playerModuleClick);
+	playerModuleClick._lpbrSignal.rampTo(0.5, "1:0", "3:0");
+	playerModuleClick._lpbrSignal.rampTo(1, "1:0", "6:0"); */
 
 	let playerModuleThree = new PlayerModule({
-		start: "6:0",
-		length: "25m",
+		start: "1:0",
+		length: "10m",
 		interval: "4n",
 		//density: 0.8,
-		fadeOut: 1.1,
+		fadeOut: 0.1,
 		decay: "3m",
 		pitch: "C4",
+		recordingURL: "../src/assets/ravel.mp3",
 		regions: {
 			length: "1m",
 			scattering: true,
-			totalRandomization: true,
+			totalRandomization: false,
 			fadeIn: "4n",
 			// randomDetune: true,
 		},
@@ -104,7 +107,7 @@ function setupModules() {
 	playerModuleThree.channel.connect(reverb);
 	modules.push(playerModuleThree);
 
-	let recorderModule = new RecorderModule({
+	/* let recorderModule = new RecorderModule({
 		title: "Recording",
 		start: "1m",
 		length: "3m",
@@ -120,7 +123,7 @@ function setupModules() {
 			modules.splice(modules.indexOf(recorderModule), 1);
 		},
 	});
-	modules.push(recorderModule);
+	modules.push(recorderModule); */
 
 	// let playerModule = new PlayerModule({
 	// 	start: "1:0",

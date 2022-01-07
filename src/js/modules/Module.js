@@ -1,3 +1,5 @@
+import * as Tone from "tone";
+
 export default class Module {
 	constructor(options) {
 		//Public
@@ -12,10 +14,8 @@ export default class Module {
 				"A module has to have a length. Module will not work as expected."
 			);
 		}
-		this._start = this.valueToSeconds(Tone.Transport.toSeconds(options.start));
-		this._length = this.valueToSeconds(
-			Tone.Transport.toSeconds(options.length)
-		);
+		this._start = options.start;
+		this._length = options.length;
 		this.end = this.start + this.length;
 		// console.log(this.end);
 		// console.log(this.length);
@@ -35,12 +35,6 @@ export default class Module {
 			},
 			options
 		);
-	}
-
-	valueToSeconds(value, chosenValue = 0) {
-		return value
-			? Tone.Transport.toSeconds(value)
-			: Tone.Transport.toSeconds(chosenValue);
 	}
 
 	toSeconds(time) {
@@ -63,13 +57,6 @@ export default class Module {
 		this._progress = 0;
 		this._started = false;
 		this.moduleFinished();
-	}
-
-	connect(toneAudioStream) {
-		console.error(
-			"This module does not support connecting, try player module or..."
-		);
-		return;
 	}
 
 	update(passedTime) {

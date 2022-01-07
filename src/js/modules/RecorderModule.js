@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 import Module from "./Module.js";
 
 export default class RecorderModule extends Module {

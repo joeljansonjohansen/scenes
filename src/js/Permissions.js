@@ -1,3 +1,5 @@
+import * as Tone from "tone";
+
 export default class Permissions {
 	constructor(...args) {
 		args.forEach((arg) => {

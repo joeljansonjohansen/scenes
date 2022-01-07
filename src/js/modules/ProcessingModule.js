@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 import AudioModule from "./AudioModule.js";
 
 /* 

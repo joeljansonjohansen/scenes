@@ -2,7 +2,7 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	background-color: rgb(50, 50, 50);
+	background-color: rgb(65, 65, 65);
 }
 canvas {
 	display: block;

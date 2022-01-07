@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 export default function setupDomEvents(permissions) {
 	document
 		.getElementById("getMicrophoneAccess")

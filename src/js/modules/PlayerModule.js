@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 import AudioModule from "./AudioModule.js";
 import Region from "../sources/Region.js";
 
@@ -44,7 +45,18 @@ export default class PlayerModule extends AudioModule {
 		this.recordingURL = options.recordingURL;
 	}
 
+	/* nextEvent(eventTime) {
+		Tone.Transport.scheduleOnce((time) => {
+			let diff = Tone.now() - time;
+			console.log(this.interval);
+			this.nextEvent("+" + this.interval / this._lpbrSignal.value);
+			let regionChannel = this.regions.playRegion(time);
+			regionChannel.chain(this._channelAmpEnv, this.channel);
+		}, eventTime);
+	} */
+
 	scheduleEvent(eventTime) {
+		//this.nextEvent(eventTime);
 		//Implement interval-array like this kindof:
 		/* let iter = 0;
 		let array = ["1m", "4n", "8n", "2n", "1m", "16n"];
@@ -65,7 +77,7 @@ export default class PlayerModule extends AudioModule {
 			// }
 			let regionChannel = this.regions.playRegion(time);
 			regionChannel.chain(this._channelAmpEnv, this.channel);
-			console.log(this._loop.playbackRate);
+			//console.log(this._loop.playbackRate);
 
 			this._loop.playbackRate = this.loopPlaybackRate;
 		}, this.interval);

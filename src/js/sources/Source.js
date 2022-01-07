@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 export function getSource(options) {
 	switch (options.sourceType) {
 		case "osc":
