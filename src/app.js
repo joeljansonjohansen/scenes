@@ -165,14 +165,55 @@ function setupModules() {
 document
 	.getElementById("getMicrophoneAccess")
 	?.addEventListener("click", async () => {
-		await permissions.getPermissions();
-		document.getElementById("getMicrophoneAccess").style.display = "none";
-		document.getElementById("startButton").style.display = "block";
+		let infoHeader = document.getElementById("information-header");
+		let infoBread = document.getElementById("information-bread");
+		try {
+			await permissions.getPermissions();
+			infoHeader.innerHTML = "Permission Granted";
+			infoBread.innerHTML =
+				"Perfect — the piece can now begin. Once you push the start button below, you will have a 2 bar count in, 8 quarter notes and then you are in bar number one of the score.";
+			document.getElementById("getMicrophoneAccess").style.display = "none";
+			document.getElementById("startButton").style.display = "block";
+		} catch (error) {
+			infoHeader.innerHTML = "Permission Denied";
+			infoBread.innerHTML =
+				"Something went wrong. Did you press “Don't allow”? If so refresh the page and try again, this piece needs access to the microphone.<br /><br />Worst case scenario is that your device doesn't support what is needed for this piece. You can try with your computer or another device. You could also visit the link below to see more possible solutions.";
+			console.log(error);
+			document.getElementById("getMicrophoneAccess").style.display = "none";
+			let startButton = document.getElementById("startButton");
+			startButton.style.display = "block";
+			startButton.innerText = "Refresh";
+		}
 	});
 
-document.getElementById("startButton")?.addEventListener("click", () => {
-	setupModules();
-	Tone.Transport.start();
+document.getElementById("startButton")?.addEventListener("click", (e) => {
+	let mainTitle = document.getElementById("main-title");
+	let info = document.getElementById("info");
+	let instrument = document.getElementById("instrument");
+	let written = document.getElementById("written");
+	let informationHolder = document.getElementById("information-holder");
+
+	mainTitle.style.transform = "translateY(-600px)";
+	info.style.transform = "translateY(-500px)";
+	instrument.style.transform = "translateY(-400px)";
+	written.style.transform = "translateY(-300px)";
+	informationHolder.style.opacity = "0";
+
+	e.target.style.width = "45px";
+	e.target.style.maxWidth = "45px";
+	e.target.style.minWidth = "45px";
+	e.target.style.color = "rgba(255, 109, 109, 0)";
+	e.target.style.opacity = "0";
+
+	setTimeout(() => {
+		console.log("Animation finished");
+		let canvas = document.getElementById("defaultCanvas0");
+		canvas.style.opacity = "1";
+		setupModules();
+		setTimeout(() => {
+			Tone.Transport.start();
+		}, 2500);
+	}, 1500);
 	// Tone.Transport.loop = true;
 	// Tone.Transport.loopEnd = "4:0";
 	// Tone.Transport.loopStart = "3:0";

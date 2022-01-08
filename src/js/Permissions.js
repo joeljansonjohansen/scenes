@@ -8,13 +8,21 @@ export default class Permissions {
 	}
 	async getPermissions() {
 		await this.startTone();
-		await this.getMicrophone();
+		try {
+			await this.getMicrophone();
+		} catch (error) {
+			throw new Error("Could not open microphone");
+		}
 		//await this.getGyroscope();
-		console.log("Permissions granted");
+		//console.log("Permissions granted");
 	}
 
 	async startTone() {
-		await Tone.start();
+		try {
+			await Tone.start();
+		} catch (error) {
+			throw new Error("Could not start Tone");
+		}
 		console.log("Tone was started!");
 	}
 
@@ -25,6 +33,7 @@ export default class Permissions {
 			console.log("got microphone access");
 		} catch (error) {
 			console.log("mic not open: ", error);
+			throw new Error("Could not open microphone");
 		}
 	}
 

@@ -19,6 +19,13 @@
 	}
 }
 
+#main-title,
+#info,
+#instrument,
+#written {
+	transition: ease-in-out 1.3s;
+}
+
 #main-title {
 	font-family: Elgoc, Georgia, "Times New Roman", Times, serif;
 	letter-spacing: 0.5em;
@@ -38,6 +45,7 @@
 }
 
 #information-holder {
+	transition: ease-in-out 1s;
 	margin-bottom: 44px;
 	& h2 {
 		font-family: Forum, Georgia, "Times New Roman", Times, serif;
