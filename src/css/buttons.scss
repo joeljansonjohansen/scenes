@@ -9,6 +9,8 @@ button {
 	line-height: 45px;
 	height: 45px;
 	margin: 10px 0px;
+	letter-spacing: 0.4em;
+	padding-left: 0.9em;
 	&:active {
 		background-color: $complementary-color;
 		color: $background-color;
@@ -17,5 +19,10 @@ button {
 
 #startButton {
 	display: none;
-	transition: ease-in-out 1s;
+	transition: all ease-in-out 1s;
+	//transition-property: width, opacity;
+}
+
+#stopButton {
+	transition: opacity ease-in-out 1s;
 }

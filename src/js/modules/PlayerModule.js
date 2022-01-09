@@ -93,6 +93,7 @@ export default class PlayerModule extends AudioModule {
 	 * We should keep track of all the event-IDs and cancel here if the module is stopped.
 	 */
 	async stopModule() {
+		console.log("Stopping playermodule");
 		super.stopModule();
 	}
 
@@ -172,6 +173,7 @@ export default class PlayerModule extends AudioModule {
 		Tone.Transport.scheduleOnce((time) => {
 			this.buffer?.dispose();
 			this.regions?.dispose();
+			this.channel?.dispose();
 		}, "+" + (this.decay + 0.1));
 	}
 }

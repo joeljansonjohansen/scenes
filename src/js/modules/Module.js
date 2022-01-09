@@ -45,6 +45,7 @@ export default class Module {
 		this._initialTime = Tone.Transport.seconds;
 		console.log("Module started, do we need a callback?");
 		this._started = true;
+		this._ended = false;
 	}
 	moduleFinished() {
 		console.log("Module was finished");
@@ -57,6 +58,13 @@ export default class Module {
 		this._progress = 0;
 		this._started = false;
 		this.moduleFinished();
+	}
+
+	implicitStop() {
+		this._ended = true;
+		this._initialTime = undefined;
+		this._progress = 0;
+		this._started = false;
 	}
 
 	update(passedTime) {

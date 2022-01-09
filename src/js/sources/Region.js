@@ -252,6 +252,8 @@ export default class OSRegion {
 	}
 
 	dispose() {
+		this._channel?.dispose();
+		this.currentEnvelope?.dispose();
 		this._buffer?.dispose();
 		this._reversedBuffer?.dispose();
 		for (const source of this._activeSources) {

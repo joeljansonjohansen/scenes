@@ -3,41 +3,71 @@ import ProcessingModule from "../src/js/modules/ProcessingModule.js";
 import RecorderModule from "../src/js/modules/RecorderModule.js";
 import Permissions from "../src/js/Permissions.js";
 import setupDomEvents from "../src/js/DomInteraction.js";
+import GraphicTestModule from "./js/modules/GraphicTestModule.js";
 
-import ravel from "./assets/ravel.mp3";
+import ravel from "./assets/saxophone-c4.mp3";
+import font from "./assets/fonts/Forum-Regular.ttf";
 import p5 from "p5";
 import * as Tone from "tone";
 
 let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
+let animationsOn = false;
+
+let reverb;
+
+let fontRegular;
+function preload() {
+	fontRegular = loadFont(font);
+}
 
 function setup() {
-	let canvas = createCanvas(400, 400);
+	let canvas = createCanvas(windowWidth, windowHeight);
 	//canvas.parent("main");
-	background(244);
-	textFont("Helvetica");
-	Tone.Transport.bpm.value = 120;
+	//background(244);
+	Tone.Transport.bpm.value = 114;
+}
+
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
 }
 
 function draw() {
 	// let density = map(mouseY, 0, windowHeight, 0.1, 3.2);
 	// let detune = map(mouseX, 0, windowWidth, 700, -2400);
 	// console.log(density);
-	background(244);
+	let bg = color(229);
+	let comp = color(255, 109, 109);
+	background(bg);
+	noFill();
+	stroke(comp);
+	rect(10, 10, windowWidth - 20, windowHeight - 20);
+	noStroke();
+	fill(comp);
 	let tonePos = Tone.Transport.position.split(":");
 	let string = parseInt(tonePos[0]) + ":" + (1 + parseInt(tonePos[1]));
-	textSize(24);
-	text(string, 40, height - 40);
-	textSize(12);
+	textSize(40);
+	textAlign(RIGHT, TOP);
+	textFont(fontRegular);
+	//text(string, windowWidth - 60, 50);
+	text(string, windowWidth - 120, 25, 100, 100);
+	textAlign(LEFT, TOP);
+	text("A", 30, 25, 100, 100);
+	textSize(20);
+	textAlign(CENTER, TOP);
+	text("INFINITE LEISURE", 10, 38, windowWidth - 20, 100);
 
+	textSize(12);
+	textFont("Helvetica");
+	textAlign(LEFT);
 	let passedTime = Tone.Transport.seconds;
 	let index = 1;
 	for (let module of modules) {
 		//module.detune = detune;
 		//module.density = density;
 		let x = 40;
-		let y = 4 * index;
-		let w = 320;
+		let y = windowHeight / 2 + 4 * index;
+		let w = windowWidth - 80;
 		let h = 5;
 		module.update(passedTime);
 		module.draw(x, y, w, h);
@@ -47,46 +77,27 @@ function draw() {
 
 function setupModules() {
 	//Setup effects
-	let reverb = new Tone.Reverb(5.5, 1.0).toDestination();
+	reverb = new Tone.Reverb(5.5, 1.0).toDestination();
 
-	/* let processingModule = new ProcessingModule({
+	let gtm = new GraphicTestModule({
 		start: "1:0",
-		length: "4m",
-		fadeIn: "1m",
-		fadeOut: "1m",
-		input: permissions.mic,
-		setup: () => {
-			const filter = new Tone.Filter(5000, "lowpass");
-			const ps = new Tone.PitchShift(-12);
-			processingModule.processingUnits.push(filter);
-			processingModule.processingUnits.push(ps);
-		},
+		length: "2m",
 		onEnd: () => {
 			console.log("module finished");
-			modules.splice(modules.indexOf(processingModule), 1);
+			modules.splice(modules.indexOf(gtm), 1);
 		},
 	});
-	processingModule.channel.connect(reverb);
-	modules.push(processingModule); */
+	modules.push(gtm);
 
-	/* let playerModuleClick = new PlayerModule({
-		start: "1:0",
-		length: "25m",
-		interval: "4n",
-		regions: {
-			length: "4n",
-			fadeOut: "8n",
-			sourceType: "osc",
-		},
+	let gtm2 = new GraphicTestModule({
+		start: "3:0",
+		length: "5m",
 		onEnd: () => {
 			console.log("module finished");
-			modules.splice(modules.indexOf(playerModuleClick), 1);
+			modules.splice(modules.indexOf(gtm2), 1);
 		},
 	});
-	playerModuleClick.channel.connect(reverb);
-	modules.push(playerModuleClick);
-	playerModuleClick._lpbrSignal.rampTo(0.5, "1:0", "3:0");
-	playerModuleClick._lpbrSignal.rampTo(1, "1:0", "6:0"); */
+	modules.push(gtm2);
 
 	let playerModuleThree = new PlayerModule({
 		start: "1:0",
@@ -187,33 +198,45 @@ document
 	});
 
 document.getElementById("startButton")?.addEventListener("click", (e) => {
-	let mainTitle = document.getElementById("main-title");
-	let info = document.getElementById("info");
-	let instrument = document.getElementById("instrument");
-	let written = document.getElementById("written");
-	let informationHolder = document.getElementById("information-holder");
+	let canvas = document.getElementById("defaultCanvas0");
+	let stopButton = document.getElementById("stopButton");
+	canvas.style.display = "block";
 
-	mainTitle.style.transform = "translateY(-600px)";
-	info.style.transform = "translateY(-500px)";
-	instrument.style.transform = "translateY(-400px)";
-	written.style.transform = "translateY(-300px)";
-	informationHolder.style.opacity = "0";
+	if (animationsOn) {
+		let mainTitle = document.getElementById("main-title");
+		let info = document.getElementById("info");
+		let instrument = document.getElementById("instrument");
+		let written = document.getElementById("written");
+		let informationHolder = document.getElementById("information-holder");
 
-	e.target.style.width = "45px";
-	e.target.style.maxWidth = "45px";
-	e.target.style.minWidth = "45px";
-	e.target.style.color = "rgba(255, 109, 109, 0)";
-	e.target.style.opacity = "0";
+		mainTitle.style.transform = "translateY(-600px)";
+		info.style.transform = "translateY(-500px)";
+		instrument.style.transform = "translateY(-400px)";
+		written.style.transform = "translateY(-300px)";
+		informationHolder.style.opacity = "0";
 
-	setTimeout(() => {
-		console.log("Animation finished");
-		let canvas = document.getElementById("defaultCanvas0");
-		canvas.style.opacity = "1";
-		setupModules();
+		e.target.style.width = "45px";
+		e.target.style.maxWidth = "45px";
+		e.target.style.minWidth = "45px";
+		e.target.style.color = "rgba(255, 109, 109, 0)";
+		e.target.style.opacity = "0";
+
 		setTimeout(() => {
-			Tone.Transport.start();
-		}, 2500);
-	}, 1500);
+			console.log("Animation finished");
+			canvas.style.opacity = "1";
+			stopButton.style.opacity = "1";
+			setupModules();
+			setTimeout(() => {
+				Tone.Transport.start();
+			}, 2500);
+		}, 1500);
+	} else {
+		canvas.style.opacity = "1";
+		stopButton.style.opacity = "1";
+		setupModules();
+		Tone.Transport.start();
+	}
+
 	// Tone.Transport.loop = true;
 	// Tone.Transport.loopEnd = "4:0";
 	// Tone.Transport.loopStart = "3:0";
@@ -226,5 +249,36 @@ document.getElementById("startButton")?.addEventListener("click", (e) => {
 	// }, "1m");
 });
 
+document.getElementById("stopButton")?.addEventListener("click", (e) => {
+	if (Tone.Transport.state === "started") {
+		Tone.Transport.stop();
+		console.log(Tone.Transport.position);
+		let masterOut = Tone.getDestination();
+		masterOut.volume.value = -Infinity;
+		e.target.innerText = "Refresh page to start over";
+		e.target.style.width = "unset";
+		e.target.style.minWidth = "unset";
+		e.target.style.maxWidth = "unset";
+		e.target.style.padding = "0px 30px";
+		for (let module of modules) {
+			console.log(module);
+			//module.channel?.disconnect(reverb);
+			module.implicitStop();
+		}
+	} else {
+		//modules = [];
+		/* console.log(modules);
+		//setupModules();
+		Tone.Transport.start();
+		console.log(Tone.Transport.position);
+		let masterOut = Tone.getDestination();
+		masterOut.volume.value = 0;
+		e.target.innerText = "Stop"; */
+		location.reload();
+	}
+});
+
 window.setup = setup;
 window.draw = draw;
+window.windowResized = windowResized;
+window.preload = preload;

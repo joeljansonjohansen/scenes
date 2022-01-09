@@ -23,7 +23,7 @@
 #info,
 #instrument,
 #written {
-	transition: ease-in-out 1.3s;
+	transition: transform ease-in-out 1.3s;
 }
 
 #main-title {
@@ -41,11 +41,12 @@
 #written {
 	font-family: Forum, Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
+	font-style: italic;
 	letter-spacing: 0.4em;
 }
 
 #information-holder {
-	transition: ease-in-out 1s;
+	transition: opacity ease-in-out 1s;
 	margin-bottom: 44px;
 	& h2 {
 		font-family: Forum, Georgia, "Times New Roman", Times, serif;

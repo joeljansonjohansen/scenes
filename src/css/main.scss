@@ -26,10 +26,10 @@ body {
 }
 canvas {
 	position: absolute;
-	top: 11px;
-	left: 11px;
-	display: block;
-	transition: ease-in-out 1s;
+	top: 0;
+	left: 0;
+	display: none;
+	transition: opacity ease-in-out 1s;
 	opacity: 0;
 }
 
