@@ -12,7 +12,7 @@ import * as Tone from "tone";
 
 let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
-let animationsOn = false;
+let animationsOn = true;
 
 let reverb;
 
@@ -22,6 +22,15 @@ function preload() {
 }
 
 function setup() {
+	let height = parseInt(document.documentElement.clientHeight);
+	let width = parseInt(document.documentElement.clientWidth);
+
+	document.body.style.width = width + "px";
+	document.body.style.height = height + "px";
+
+	// document.html.style.width = width + "px";
+	// document.html.style.height = height + "px";
+
 	let canvas = createCanvas(windowWidth, windowHeight);
 	//canvas.parent("main");
 	//background(244);
@@ -29,6 +38,14 @@ function setup() {
 }
 
 function windowResized() {
+	let height = parseInt(document.documentElement.clientHeight);
+	let width = parseInt(document.documentElement.clientWidth);
+
+	document.body.style.width = width + "px";
+	document.body.style.height = height + "px";
+
+	// document.html.style.width = width + "px";
+	// document.html.style.height = height + "px";
 	resizeCanvas(windowWidth, windowHeight);
 }
 
@@ -225,6 +242,7 @@ document.getElementById("startButton")?.addEventListener("click", (e) => {
 			console.log("Animation finished");
 			canvas.style.opacity = "1";
 			stopButton.style.opacity = "1";
+			document.getElementById("stopButton").style.display = "block";
 			setupModules();
 			setTimeout(() => {
 				Tone.Transport.start();
@@ -233,6 +251,7 @@ document.getElementById("startButton")?.addEventListener("click", (e) => {
 	} else {
 		canvas.style.opacity = "1";
 		stopButton.style.opacity = "1";
+		document.getElementById("stopButton").style.display = "block";
 		setupModules();
 		Tone.Transport.start();
 	}

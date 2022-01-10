@@ -1,14 +1,41 @@
 @font-face {
-	font-family: "Lato";
-	src: url("../assets/fonts/Lato-Regular.ttf");
-}
-@font-face {
-	font-family: "Elgoc";
-	src: url("../assets/fonts/Elgoc-Thin.otf");
-}
-@font-face {
 	font-family: "Forum";
-	src: url("../assets/fonts/Forum-Regular.ttf");
+	src: url("../assets/fonts/Forum.eot");
+	src: url("../assets/fonts/Forum.eot?#iefix") format("embedded-opentype"),
+		url("../assets/fonts/Forum.woff2") format("woff2"),
+		url("../assets/fonts/Forum.woff") format("woff"),
+		url("../assets/fonts/Forum-Regular.ttf") format("truetype"),
+		url("../assets/fonts/Forum.svg#Forum") format("svg");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Lato";
+	src: url("../assets/fonts/Lato-Regular.eot");
+	src: url("../assets/fonts/Lato-Regular.eot?#iefix")
+			format("embedded-opentype"),
+		url("../assets/fonts/Lato-Regular.woff2") format("woff2"),
+		url("../assets/fonts/Lato-Regular.woff") format("woff"),
+		url("../assets/fonts/Lato-Regular.ttf") format("truetype"),
+		url("../assets/fonts/Lato-Regular.svg#Lato-Regular") format("svg");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+/* Webfont: Elgoc-Thin */
+@font-face {
+	font-family: "ElgocThin";
+	src: /* IE6-IE8 */ url("../assets/fonts/Elgoc-Thin.woff") format("woff"),
+		/* Modern Browsers */ url("../assets/fonts/Elgoc-Thin.woff2")
+			format("woff2"),
+		/* Modern Browsers */ url("../assets/fonts/Elgoc-Thin.ttf")
+			format("truetype"); /* Safari, Android, iOS */
+	font-style: normal;
+	font-weight: normal;
+	text-rendering: optimizeLegibility;
 }
 
 $background-color: rgb(229, 229, 229);

@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
 	entry: "./src/index.js",
 	output: {
-		filename: "main.js",
+		filename: "main.[hash].js",
 		path: path.resolve(__dirname, "dist"),
 	},
 	plugins: [
@@ -19,14 +19,28 @@ module.exports = {
 				use: ["html-loader"],
 			},
 			{
-				test: /\.(mp3|wav|m4a|otf|ttf)$/i,
+				test: /\.(mp3|wav|m4a)$/i,
 				use: {
 					loader: "file-loader",
 					options: {
 						name: "[name].[ext]",
-						outputPath: "src/assets/",
+						outputPath: "./src/assets/",
 					},
 				},
+			},
+			{
+				test: /\.(otf|ttf|eot|woff|woff2|svg)$/i,
+				type: "asset/resource",
+				generator: {
+					filename: "./src/assets/fonts/[name][ext]",
+				},
+				/* use: {
+					loader: "file-loader",
+					options: {
+						filename: "[name].[ext]",
+						outputPath: "./src/assets/fonts",
+					},
+				}, */
 			},
 		],
 	},
