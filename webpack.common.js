@@ -28,6 +28,16 @@ module.exports = {
 					},
 				},
 			},
+			/* {
+				test: /manifest.json$/i,
+				use: {
+					loader: "file-loader",
+					options: {
+						name: "[name].[ext]",
+						outputPath: "./",
+					},
+				},
+			}, */
 			{
 				test: /\.(otf|ttf|eot|woff|woff2|svg)$/i,
 				type: "asset/resource",

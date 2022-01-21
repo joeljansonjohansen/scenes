@@ -76,18 +76,20 @@ export default class Module {
 			console.log("ends module");
 			this.stopModule();
 		}
+		// if (this._started) {
+		// 	this.draw();
+		// }
 	}
 
-	draw(x, y, w, h) {
+	draw(y = 0) {
 		if (this._ended) {
 			return;
 		}
 		if (this._started) {
 			fill(204, 105, 205);
 			noStroke();
-			text(this.title, x, y);
-			y += 20;
-			rect(x, y, w * this.progress, h);
+			text(this.title, 0, y);
+			rect(0, y + 20, 100 * this.progress, 100);
 		}
 	}
 

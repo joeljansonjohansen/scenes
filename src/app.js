@@ -3,22 +3,30 @@ import ProcessingModule from "../src/js/modules/ProcessingModule.js";
 import RecorderModule from "../src/js/modules/RecorderModule.js";
 import Permissions from "../src/js/Permissions.js";
 import setupDomEvents from "../src/js/DomInteraction.js";
-import GraphicTestModule from "./js/modules/GraphicTestModule.js";
+import GraphicModule from "./js/modules/GraphicModule.js";
+import { backgroundColor, complementaryColor } from "./js/Globals.js";
+
+import Syncronizer from "./js/Quasi-Sync.js";
 
 import ravel from "./assets/saxophone-c4.mp3";
 import font from "./assets/fonts/Forum-Regular.ttf";
+import lato from "./assets/fonts/Lato-Regular.ttf";
 import p5 from "p5";
 import * as Tone from "tone";
 
 let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
-let animationsOn = true;
+let animationsOn = false;
 
 let reverb;
 
+let sync = new Syncronizer({ bpm: 114 });
+
 let fontRegular;
+var fontLato;
 function preload() {
 	fontRegular = loadFont(font);
+	fontLato = loadFont(lato);
 }
 
 function setup() {
@@ -50,11 +58,17 @@ function windowResized() {
 }
 
 function draw() {
+	sync.update();
 	// let density = map(mouseY, 0, windowHeight, 0.1, 3.2);
 	// let detune = map(mouseX, 0, windowWidth, 700, -2400);
 	// console.log(density);
-	let bg = color(229);
-	let comp = color(255, 109, 109);
+	let bg = color(backgroundColor[0]);
+	let comp = color(
+		complementaryColor[0],
+		complementaryColor[1],
+		complementaryColor[2]
+	);
+
 	background(bg);
 	noFill();
 	stroke(comp);
@@ -77,17 +91,14 @@ function draw() {
 	textSize(12);
 	textFont("Helvetica");
 	textAlign(LEFT);
+
 	let passedTime = Tone.Transport.seconds;
 	let index = 1;
 	for (let module of modules) {
 		//module.detune = detune;
 		//module.density = density;
-		let x = 40;
-		let y = windowHeight / 2 + 4 * index;
-		let w = windowWidth - 80;
-		let h = 5;
 		module.update(passedTime);
-		module.draw(x, y, w, h);
+		module.draw();
 		index++;
 	}
 }
@@ -96,9 +107,11 @@ function setupModules() {
 	//Setup effects
 	reverb = new Tone.Reverb(5.5, 1.0).toDestination();
 
-	let gtm = new GraphicTestModule({
-		start: "1:0",
+	let gtm = new GraphicModule({
+		start: "0:0",
 		length: "2m",
+		title: "Long long long long long long title",
+		showsCircle: true,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(gtm), 1);
@@ -106,9 +119,10 @@ function setupModules() {
 	});
 	modules.push(gtm);
 
-	let gtm2 = new GraphicTestModule({
+	let gtm2 = new GraphicModule({
 		start: "3:0",
 		length: "5m",
+		showsLine: true,
 		onEnd: () => {
 			console.log("module finished");
 			modules.splice(modules.indexOf(gtm2), 1);
