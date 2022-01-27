@@ -58,7 +58,7 @@ function windowResized() {
 }
 
 function draw() {
-	sync.update();
+	//sync.update();
 	// let density = map(mouseY, 0, windowHeight, 0.1, 3.2);
 	// let detune = map(mouseX, 0, windowWidth, 700, -2400);
 	// console.log(density);
@@ -105,9 +105,13 @@ function draw() {
 
 function setupModules() {
 	//Setup effects
-	reverb = new Tone.Reverb(5.5, 1.0).toDestination();
+	reverb = new Tone.Reverb(5.5);
+	reverb.wet = 0.0;
+	const filter = new Tone.Filter(2347, "lowpass").toDestination();
+	filter.rolloff = -48;
+	reverb.connect(filter);
 
-	let gtm = new GraphicModule({
+	/* let gtm = new GraphicModule({
 		start: "0:0",
 		length: "2m",
 		title: "Long long long long long long title",
@@ -128,22 +132,27 @@ function setupModules() {
 			modules.splice(modules.indexOf(gtm2), 1);
 		},
 	});
-	modules.push(gtm2);
+	modules.push(gtm2); */
 
 	let playerModuleThree = new PlayerModule({
-		start: "1:0",
-		length: "10m",
-		interval: "4n",
+		start: "10:0",
+		length: "15m",
+		interval: "1m",
 		//density: 0.8,
 		fadeOut: 0.1,
 		decay: "3m",
-		pitch: "C4",
-		recordingURL: ravel,
+		//pitch: "C4",
+		//recordingURL: ravel,
 		regions: {
-			length: "1m",
+			length: "4m",
+			totalRandomization: true,
 			scattering: true,
-			totalRandomization: false,
-			fadeIn: "4n",
+			randomDelay: false,
+			fadeIn: 0.1,
+			fadeOut: 0.1,
+			detune: -1200,
+			sourceType: "grainPlayer",
+			//sourceType: "player",
 			// randomDetune: true,
 		},
 		onEnd: () => {
@@ -154,13 +163,46 @@ function setupModules() {
 	playerModuleThree.channel.connect(reverb);
 	modules.push(playerModuleThree);
 
-	/* let recorderModule = new RecorderModule({
+	let playerModule = new PlayerModule({
+		start: "15:0",
+		length: "20m",
+		interval: "4m",
+		//density: 0.8,
+		fadeOut: 0.1,
+		decay: "3m",
+		//pitch: "C4",
+		//recordingURL: ravel,
+		regions: {
+			length: "7m",
+			scattering: true,
+			fadeIn: 0.1,
+			fadeOut: 0.1,
+			detune: -700,
+			sourceType: "grainPlayer",
+			//sourceType: "player",
+			// randomDetune: true,
+		},
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModule), 1);
+		},
+	});
+	playerModule.channel.connect(reverb);
+	modules.push(playerModule);
+
+	let recorderModule = new RecorderModule({
 		title: "Recording",
 		start: "1m",
-		length: "3m",
+		length: "7m",
 		input: permissions.mic,
 		onEnd: () => {
 			playerModuleThree.prepareModule({
+				recordingURL: recorderModule.recordingURL,
+				moduleReady: () => {
+					console.log("Recorder module connected to other module");
+				},
+			});
+			playerModule.prepareModule({
 				recordingURL: recorderModule.recordingURL,
 				moduleReady: () => {
 					console.log("Recorder module connected to other module");
@@ -170,7 +212,7 @@ function setupModules() {
 			modules.splice(modules.indexOf(recorderModule), 1);
 		},
 	});
-	modules.push(recorderModule); */
+	modules.push(recorderModule);
 
 	// let playerModule = new PlayerModule({
 	// 	start: "1:0",

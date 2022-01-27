@@ -244,11 +244,11 @@ export default class OSRegion {
 	}
 
 	set totalRandomization(value) {
-		this.scattering = true;
-		this.randomFiltering = true;
-		this.randomDelay = true;
-		this.randomReversing = true;
-		this.randomDetune = true;
+		this.scattering = value;
+		this.randomFiltering = value;
+		this.randomDelay = value;
+		this.randomReversing = value;
+		this.randomDetune = value;
 	}
 
 	dispose() {

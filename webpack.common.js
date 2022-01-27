@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
 	entry: "./src/index.js",
 	output: {
-		filename: "main.[hash].js",
+		filename: "main.[fullhash].js",
 		path: path.resolve(__dirname, "dist"),
 	},
 	plugins: [
@@ -28,8 +28,8 @@ module.exports = {
 					},
 				},
 			},
-			/* {
-				test: /manifest.json$/i,
+			{
+				test: /\.json$/i,
 				use: {
 					loader: "file-loader",
 					options: {
@@ -37,7 +37,7 @@ module.exports = {
 						outputPath: "./",
 					},
 				},
-			}, */
+			},
 			{
 				test: /\.(otf|ttf|eot|woff|woff2|svg)$/i,
 				type: "asset/resource",

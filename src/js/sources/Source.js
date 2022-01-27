@@ -22,6 +22,7 @@ export function random(options) {
 }
 
 export function grainPlayer(options) {
+	console.log("n this", options.detune);
 	let source = new Tone.GrainPlayer({
 		loop: false,
 		url: options.buffer,
