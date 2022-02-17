@@ -2,14 +2,23 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-	entry: "./src/index.js",
+	entry: {
+		app: "./src/index.js",
+		test: "./src/test.js",
+	},
 	output: {
-		filename: "main.[fullhash].js",
+		filename: "[name].[fullhash].js",
 		path: path.resolve(__dirname, "dist"),
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
 			template: "./index.html",
+		}),
+		new HtmlWebpackPlugin({
+			// Also generate a test.html
+			filename: "test.html",
+			template: "./test.html",
+			excludeChunks: ["app"],
 		}),
 	],
 	module: {

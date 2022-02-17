@@ -51,7 +51,7 @@ export default class AudioModule extends Module {
 			{
 				title: "AudioModule",
 				fadeIn: 0,
-				fadeOut: 0.1, //Default fade-out, to avoid click at the end.
+				fadeOut: 0.1, //set fadeout to avoid clicks.
 				decay: 0,
 			},
 			options

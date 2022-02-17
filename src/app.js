@@ -1,26 +1,24 @@
 import PlayerModule from "../src/js/modules/PlayerModule.js";
-import ProcessingModule from "../src/js/modules/ProcessingModule.js";
 import RecorderModule from "../src/js/modules/RecorderModule.js";
 import Permissions from "../src/js/Permissions.js";
-import setupDomEvents from "../src/js/DomInteraction.js";
-import GraphicModule from "./js/modules/GraphicModule.js";
 import { backgroundColor, complementaryColor } from "./js/Globals.js";
 
 import Syncronizer from "./js/Quasi-Sync.js";
 
-import ravel from "./assets/saxophone-c4.mp3";
+import wssax from "./assets/wssax.mp3";
 import font from "./assets/fonts/Forum-Regular.ttf";
 import lato from "./assets/fonts/Lato-Regular.ttf";
+
 import p5 from "p5";
 import * as Tone from "tone";
+import Mixer from "./js/Mixer.js";
 
 let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
 let animationsOn = false;
 
-let reverb;
-
 let sync = new Syncronizer({ bpm: 114 });
+const mixer = new Mixer();
 
 let fontRegular;
 var fontLato;
@@ -32,16 +30,11 @@ function preload() {
 function setup() {
 	let height = parseInt(document.documentElement.clientHeight);
 	let width = parseInt(document.documentElement.clientWidth);
-
 	document.body.style.width = width + "px";
 	document.body.style.height = height + "px";
 
-	// document.html.style.width = width + "px";
-	// document.html.style.height = height + "px";
+	let canvas = createCanvas(width, height);
 
-	let canvas = createCanvas(windowWidth, windowHeight);
-	//canvas.parent("main");
-	//background(244);
 	Tone.Transport.bpm.value = 114;
 }
 
@@ -54,14 +47,10 @@ function windowResized() {
 
 	// document.html.style.width = width + "px";
 	// document.html.style.height = height + "px";
-	resizeCanvas(windowWidth, windowHeight);
+	resizeCanvas(width, height);
 }
 
-function draw() {
-	//sync.update();
-	// let density = map(mouseY, 0, windowHeight, 0.1, 3.2);
-	// let detune = map(mouseX, 0, windowWidth, 700, -2400);
-	// console.log(density);
+function drawMainGui() {
 	let bg = color(backgroundColor[0]);
 	let comp = color(
 		complementaryColor[0],
@@ -91,7 +80,11 @@ function draw() {
 	textSize(12);
 	textFont("Helvetica");
 	textAlign(LEFT);
+}
 
+function draw() {
+	//console.log(mixer.limiter.red)
+	drawMainGui();
 	let passedTime = Tone.Transport.seconds;
 	let index = 1;
 	for (let module of modules) {
@@ -104,13 +97,18 @@ function draw() {
 }
 
 function setupModules() {
-	//Setup effects
-	reverb = new Tone.Reverb(5.5);
-	reverb.wet = 0.0;
-	const filter = new Tone.Filter(2347, "lowpass").toDestination();
-	filter.rolloff = -48;
-	reverb.connect(filter);
+	createPlayer("1m", -2400, "10m");
+	createPlayer("1m", -300, "5m");
+	createPlayer("1m", -1200, "10m");
+	createPlayer("1m", -0, "10m");
 
+	createPlayer("10m", -700, "10m");
+	createPlayer("5m", 400, "15m");
+	createPlayer("10m", -1200, "10m");
+	createPlayer("10m", 200, "10m");
+	//createClusterTest();
+	//createAltissimoTest();
+	// IMPLEMENTERA LIMITER!
 	/* let gtm = new GraphicModule({
 		start: "0:0",
 		length: "2m",
@@ -133,87 +131,6 @@ function setupModules() {
 		},
 	});
 	modules.push(gtm2); */
-
-	let playerModuleThree = new PlayerModule({
-		start: "10:0",
-		length: "15m",
-		interval: "1m",
-		//density: 0.8,
-		fadeOut: 0.1,
-		decay: "3m",
-		//pitch: "C4",
-		//recordingURL: ravel,
-		regions: {
-			length: "4m",
-			totalRandomization: true,
-			scattering: true,
-			randomDelay: false,
-			fadeIn: 0.1,
-			fadeOut: 0.1,
-			detune: -1200,
-			sourceType: "grainPlayer",
-			//sourceType: "player",
-			// randomDetune: true,
-		},
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModuleThree), 1);
-		},
-	});
-	playerModuleThree.channel.connect(reverb);
-	modules.push(playerModuleThree);
-
-	let playerModule = new PlayerModule({
-		start: "15:0",
-		length: "20m",
-		interval: "4m",
-		//density: 0.8,
-		fadeOut: 0.1,
-		decay: "3m",
-		//pitch: "C4",
-		//recordingURL: ravel,
-		regions: {
-			length: "7m",
-			scattering: true,
-			fadeIn: 0.1,
-			fadeOut: 0.1,
-			detune: -700,
-			sourceType: "grainPlayer",
-			//sourceType: "player",
-			// randomDetune: true,
-		},
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModule), 1);
-		},
-	});
-	playerModule.channel.connect(reverb);
-	modules.push(playerModule);
-
-	let recorderModule = new RecorderModule({
-		title: "Recording",
-		start: "1m",
-		length: "7m",
-		input: permissions.mic,
-		onEnd: () => {
-			playerModuleThree.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					console.log("Recorder module connected to other module");
-				},
-			});
-			playerModule.prepareModule({
-				recordingURL: recorderModule.recordingURL,
-				moduleReady: () => {
-					console.log("Recorder module connected to other module");
-				},
-			});
-
-			modules.splice(modules.indexOf(recorderModule), 1);
-		},
-	});
-	modules.push(recorderModule);
-
 	// let playerModule = new PlayerModule({
 	// 	start: "1:0",
 	// 	length: "5m",
@@ -244,6 +161,179 @@ function setupModules() {
 	// });
 	// playerModule.channel.connect(reverb);
 	// modules.push(playerModule);
+}
+
+function createPlayer(start = "1m", detune, length = "50m") {
+	let playerModule = new PlayerModule({
+		start: start,
+		length: length,
+		interval: "random",
+		density: 0.3,
+		fadeOut: "3m",
+		decay: "3m",
+		//pitch: "C4",
+		recordingURL: wssax,
+		regions: {
+			length: "16m",
+			scattering: true,
+			randomReversing: false,
+			randomDelay: true,
+			fadeIn: "2m",
+			fadeOut: "2m",
+			detune: detune,
+			sourceType: "player",
+			//sourceType: "player",
+			randomDetune: true,
+		},
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModule), 1);
+		},
+	});
+	playerModule.channel.connect(mixer.input);
+	modules.push(playerModule);
+}
+
+function createPlayerForCluster(detune, start, density = 0.2) {
+	let playerModule = new PlayerModule({
+		start: start,
+		length: "50m",
+		interval: "random",
+		density: density,
+		fadeOut: 0.1,
+		decay: "3m",
+		//pitch: "C4",
+		//recordingURL: ravel,
+		regions: {
+			length: "8m",
+			scattering: true,
+			randomReversing: true,
+			fadeIn: "8n",
+			fadeOut: "2m",
+			detune: detune,
+			sourceType: "grainPlayer",
+			//sourceType: "player",
+			// randomDetune: true,
+		},
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModule), 1);
+		},
+	});
+	return playerModule;
+}
+
+function createClusterTest() {
+	let octavePlayerModule = createPlayerForCluster(-1200, "20:0", 0.5);
+	let seventhPlayerModule = createPlayerForCluster(-1000, "22:2", 0.4);
+	//let minorSixthPlayerModule = createPlayerForCluster(-800, "20:2");
+	let majorSixthPlayerModule = createPlayerForCluster(-900, "21:2");
+	let fifthPlayerModule = createPlayerForCluster(-700, "21:0");
+	let fourthPlayerModule = createPlayerForCluster(-500, "20:1");
+	let thirdPlayerModule = createPlayerForCluster(-300, "20:0");
+	let secondPlayerModule = createPlayerForCluster(-100, "20:1");
+
+	let players = [];
+	players.push(octavePlayerModule);
+	players.push(seventhPlayerModule);
+	players.push(majorSixthPlayerModule);
+	players.push(fifthPlayerModule);
+	players.push(fourthPlayerModule);
+	players.push(thirdPlayerModule);
+	players.push(secondPlayerModule);
+
+	for (const player of players) {
+		player.channel.connect(mixer.input);
+		modules.push(player);
+	}
+	console.log(modules);
+
+	let recorderModule = new RecorderModule({
+		title: "Recording",
+		start: "2m",
+		length: "16m",
+		input: permissions.mic,
+		onEnd: () => {
+			console.log("recorderModule ended");
+			for (const player of players) {
+				player.prepareModule({
+					recordingURL: recorderModule.recordingURL,
+					moduleReady: () => {
+						console.log("Recorder module connected to other module");
+					},
+				});
+			}
+			modules.splice(modules.indexOf(recorderModule), 1);
+		},
+	});
+	console.log(recorderModule);
+	modules.push(recorderModule);
+	//reverb.toDestination();
+	//reverb.connect(filter);
+}
+
+function createPlayerForAltissimo(detune, start) {
+	let playerModule = new PlayerModule({
+		start: start,
+		length: "64m",
+		interval: "16m",
+		fadeOut: 0.1,
+		decay: "3m",
+		//pitch: "C4",
+		//recordingURL: ravel,
+		regions: {
+			length: "16m",
+			fadeIn: "16n",
+			fadeOut: "1m",
+			detune: detune,
+			sourceType: "grainPlayer",
+			//sourceType: "player",
+			// randomDetune: true,
+		},
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModule), 1);
+		},
+	});
+	return playerModule;
+}
+
+function createAltissimoTest() {
+	let octavePlayerModule = createPlayerForAltissimo(-1200, "20:0");
+	//let vbPlayerModule = createPlayerForAltissimo(-2400, "20:0");
+
+	let players = [];
+	players.push(octavePlayerModule);
+	//players.push(vbPlayerModule);
+
+	for (const player of players) {
+		player.channel.connect(mixer.input);
+		modules.push(player);
+	}
+	console.log(modules);
+
+	let recorderModule = new RecorderModule({
+		title: "Recording",
+		start: "2m",
+		length: "16m",
+		input: permissions.mic,
+		onEnd: () => {
+			console.log("recorderModule ended");
+			for (const player of players) {
+				player.prepareModule({
+					recordingURL: recorderModule.recordingURL,
+					moduleReady: () => {
+						console.log("Recorder module connected to other module");
+					},
+				});
+			}
+			modules.splice(modules.indexOf(recorderModule), 1);
+		},
+	});
+	console.log(recorderModule);
+	modules.push(recorderModule);
+	//reverb.connect(filter);
+	//reverb.toDestination();
 }
 
 document
