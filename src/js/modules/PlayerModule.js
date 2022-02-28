@@ -1,6 +1,7 @@
 import * as Tone from "tone";
 import AudioModule from "./AudioModule.js";
 import Region from "../sources/Region.js";
+import { ToneAudioBuffer } from "tone";
 
 /* 
     The PlayerModule can play audio files and does so for a ceratain amount of time
@@ -26,8 +27,8 @@ export default class PlayerModule extends AudioModule {
 			{
 				title: "OSPlayer",
 				density: 0.5,
-				fadeIn: 0,
-				fadeOut: 0.1, //Default fade-out, to avoid click at the end.
+				fadeIn: 0.001,
+				fadeOut: 0.001, //Default fade-out, to avoid click at the end.
 				decay: "3m", //Always setting the decay to 3 measures to let the module ring out.
 				detune: 0,
 				pitch: "C3", // Default pitch that the oscillators will start from
@@ -35,6 +36,7 @@ export default class PlayerModule extends AudioModule {
 				//loopPlaybackRate: 1,
 				harmony: undefined,
 				lpbrSignal: 1,
+				recordingCompensation: 0,
 			},
 			options
 		);
@@ -81,7 +83,7 @@ export default class PlayerModule extends AudioModule {
 
 			this._loop.playbackRate = this.loopPlaybackRate;
 		}, this.interval);
-		this._loop.start(eventTime).stop(this.end);
+		this._loop.start(eventTime - this.recordingCompensation).stop(this.end);
 
 		// let testloop = new Tone.Loop((time) => {
 		// 	console.log(Tone.Transport.position);
@@ -113,26 +115,39 @@ export default class PlayerModule extends AudioModule {
 		 * This is because setting the reverse to true on the player itself
 		 * can lead to clicks.
 		 */
-		this.buffer = new Tone.ToneAudioBuffer({
-			url: value,
-			onload: () => {
-				this.regions.buffer = this.buffer;
-			},
-			onerror: (error) => {
-				console.log("Buffer error: ", error);
-			},
-		});
-
-		this.reversedBuffer = new Tone.ToneAudioBuffer({
-			url: value,
-			reverse: true,
-			onload: () => {
-				this.regions.reversedBuffer = this.reversedBuffer;
-			},
-			onerror: (error) => {
-				console.log("Buffer error: ", error);
-			},
-		});
+		console.log("value is:", value);
+		/* this.buffer = value;
+		this.regions.buffer = this.buffer;
+		this.reversedBuffer = value;
+		this.reversedBuffer.reverse = true;
+		this.regions.reversedBuffer = this.reversedBuffer; */
+		if (value instanceof ToneAudioBuffer) {
+			this.buffer = new Tone.ToneAudioBuffer({
+				url: value,
+			});
+			this.regions.buffer = this.buffer;
+		} else {
+			this.buffer = new Tone.ToneAudioBuffer({
+				url: value,
+				onload: () => {
+					this.regions.buffer = this.buffer;
+				},
+				onerror: (error) => {
+					console.log("Buffer error: ", error);
+				},
+			});
+			/* 
+			this.reversedBuffer = new Tone.ToneAudioBuffer({
+				url: value,
+				reverse: true,
+				onload: () => {
+					this.regions.reversedBuffer = this.reversedBuffer;
+				},
+				onerror: (error) => {
+					console.log("Buffer error: ", error);
+				},
+			}); */
+		}
 	}
 
 	set interval(val) {
@@ -166,6 +181,14 @@ export default class PlayerModule extends AudioModule {
 
 	get lpbrSignal() {
 		return this._lpbrSignal;
+	}
+
+	set recordingCompensation(val) {
+		this._recordingCompensation = val;
+	}
+
+	get recordingCompensation() {
+		return this._recordingCompensation;
 	}
 
 	dispose() {

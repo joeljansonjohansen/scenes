@@ -1,5 +1,6 @@
 import PlayerModule from "../src/js/modules/PlayerModule.js";
 import RecorderModule from "../src/js/modules/RecorderModule.js";
+import GraphicModule from "../src/js/modules/GraphicModule.js";
 import Permissions from "../src/js/Permissions.js";
 import { backgroundColor, complementaryColor } from "./js/Globals.js";
 
@@ -12,6 +13,7 @@ import lato from "./assets/fonts/Lato-Regular.ttf";
 import p5 from "p5";
 import * as Tone from "tone";
 import Mixer from "./js/Mixer.js";
+import { random } from "./js/sources/Source.js";
 
 let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
@@ -19,6 +21,7 @@ let animationsOn = false;
 
 let sync = new Syncronizer({ bpm: 114 });
 const mixer = new Mixer();
+//let recModule;
 
 let fontRegular;
 var fontLato;
@@ -35,7 +38,7 @@ function setup() {
 
 	let canvas = createCanvas(width, height);
 
-	Tone.Transport.bpm.value = 114;
+	Tone.Transport.bpm.value = 120;
 }
 
 function windowResized() {
@@ -82,9 +85,57 @@ function drawMainGui() {
 	textAlign(LEFT);
 }
 
+function getAllSupportedMimeTypes(...mediaTypes) {
+	if (!mediaTypes.length) mediaTypes.push(...["video", "audio"]);
+	const FILE_EXTENSIONS = ["webm", "ogg", "mp4", "x-matroska"];
+	const CODECS = [
+		"vp9",
+		"vp9.0",
+		"vp8",
+		"vp8.0",
+		"avc1",
+		"av1",
+		"h265",
+		"h.265",
+		"h264",
+		"h.264",
+		"opus",
+	];
+
+	return [
+		...new Set(
+			FILE_EXTENSIONS.flatMap((ext) =>
+				CODECS.flatMap((codec) =>
+					mediaTypes.flatMap((mediaType) => [
+						`${mediaType}/${ext};codecs:${codec}`,
+						`${mediaType}/${ext};codecs=${codec}`,
+						`${mediaType}/${ext};codecs:${codec.toUpperCase()}`,
+						`${mediaType}/${ext};codecs=${codec.toUpperCase()}`,
+						`${mediaType}/${ext}`,
+					])
+				)
+			)
+		),
+	].filter((variation) => MediaRecorder.isTypeSupported(variation));
+}
+
 function draw() {
 	//console.log(mixer.limiter.red)
+
 	drawMainGui();
+	let allSupportedTypes = getAllSupportedMimeTypes("audio");
+	//console.log(allSupportedTypes);
+	//text("issupported:" + getAllSupportedMimeTypes("audio"), 50, 100, 200, 200);
+	allSupportedTypes.forEach((element, i) => {
+		text(element, 20, 100 + i * 10, windowWidth - 20, 100);
+	});
+	let value = mixer.meter.getValue();
+	//text(value, 10, 138, windowWidth - 20, 100);
+	if (mixer.meter.value < 0 && mixer.meter.value > -50) {
+		mixer.limiterGain.gain.value = Math.abs(mixer.meter.getValue());
+	} else {
+		mixer.limiterGain.gain.value = 5;
+	}
 	let passedTime = Tone.Transport.seconds;
 	let index = 1;
 	for (let module of modules) {
@@ -97,19 +148,58 @@ function draw() {
 }
 
 function setupModules() {
-	createPlayer("1m", -2400, "10m");
-	createPlayer("1m", -300, "5m");
-	createPlayer("1m", -1200, "10m");
-	createPlayer("1m", -0, "10m");
+	/* let playerModule = new PlayerModule({
+		start: "82m",
+		length: "200m",
+		interval: "random",
+		density: 0.3,
+		fadeIn: 0.001,
+		fadeOut: 0.001,
+		recordingCompensation: 0.4,
+		regions: {
+			length: "10m",
+			sourceType: "player",
+			offset: "random",
+			scattering: true,
+			randomDetune: true,
+			detune: 0,
+			//randomReversing: true,
+		},
+		onEnd: () => {
+			console.log("module finished");
+			modules.splice(modules.indexOf(playerModule), 1);
+		},
+	});
+	playerModule.channel.connect(mixer.input);
+	modules.push(playerModule); */
 
-	createPlayer("10m", -700, "10m");
-	createPlayer("5m", 400, "15m");
-	createPlayer("10m", -1200, "10m");
-	createPlayer("10m", 200, "10m");
+	/* const recModule = new RecorderModule({
+		start: "1m",
+		length: "10m",
+		input: permissions.mic,
+		onEnd: () => {
+			console.log("sliced buffer is:", recModule.slicedBuffer);
+			createPlayer("12m", -2400, "20m", recModule.slicedBuffer);
+			createPlayer("12m", -300, "15m", recModule.slicedBuffer);
+			createPlayer("12m", -1200, "20m", recModule.slicedBuffer);
+			createPlayer("12m", -0, "20m", recModule.slicedBuffer);
+
+			createPlayer("30m", -700, "10m", recModule.slicedBuffer);
+			createPlayer("25m", 400, "25m", recModule.slicedBuffer);
+			createPlayer("30m", -1200, "20m", recModule.slicedBuffer);
+			createPlayer("30m", 200, "20m", recModule.slicedBuffer);
+
+			createPlayer("40m", 700, "20m", recModule.slicedBuffer);
+			createPlayer("50m", 400, "20m", recModule.slicedBuffer);
+			createPlayer("50m", 1200, "20m", recModule.slicedBuffer);
+			createPlayer("50m", 0, "20m", recModule.slicedBuffer);
+		},
+	}); */
+
 	//createClusterTest();
 	//createAltissimoTest();
-	// IMPLEMENTERA LIMITER!
-	/* let gtm = new GraphicModule({
+
+	let gtm = new GraphicModule({
 		start: "0:0",
 		length: "2m",
 		title: "Long long long long long long title",
@@ -130,7 +220,7 @@ function setupModules() {
 			modules.splice(modules.indexOf(gtm2), 1);
 		},
 	});
-	modules.push(gtm2); */
+	modules.push(gtm2);
 	// let playerModule = new PlayerModule({
 	// 	start: "1:0",
 	// 	length: "5m",
@@ -163,7 +253,8 @@ function setupModules() {
 	// modules.push(playerModule);
 }
 
-function createPlayer(start = "1m", detune, length = "50m") {
+function createPlayer(start = "1m", detune, length = "50m", slicedBuffer) {
+	console.log("what is buffer here?", slicedBuffer);
 	let playerModule = new PlayerModule({
 		start: start,
 		length: length,
@@ -172,17 +263,17 @@ function createPlayer(start = "1m", detune, length = "50m") {
 		fadeOut: "3m",
 		decay: "3m",
 		//pitch: "C4",
-		recordingURL: wssax,
+		//recordingURL: slicedBuffer,
 		regions: {
 			length: "16m",
 			scattering: true,
 			randomReversing: false,
-			randomDelay: true,
+			randomDelay: false,
 			fadeIn: "2m",
 			fadeOut: "2m",
 			detune: detune,
+			//sourceType: "grainPlayer",
 			sourceType: "player",
-			//sourceType: "player",
 			randomDetune: true,
 		},
 		onEnd: () => {
@@ -190,6 +281,7 @@ function createPlayer(start = "1m", detune, length = "50m") {
 			modules.splice(modules.indexOf(playerModule), 1);
 		},
 	});
+	playerModule.recordingURL = slicedBuffer;
 	playerModule.channel.connect(mixer.input);
 	modules.push(playerModule);
 }
@@ -402,9 +494,9 @@ document.getElementById("startButton")?.addEventListener("click", (e) => {
 		Tone.Transport.start();
 	}
 
-	// Tone.Transport.loop = true;
-	// Tone.Transport.loopEnd = "4:0";
-	// Tone.Transport.loopStart = "3:0";
+	/* Tone.Transport.loop = true;
+	Tone.Transport.loopEnd = "23:0";
+	Tone.Transport.loopStart = "1:0"; */
 	// let count = 0;
 	// Tone.Transport.scheduleRepeat((time) => {
 	// 	if (count > 4) {

@@ -1,3 +1,6 @@
 node_modules
 dist
 dandelion.yml
+server.crt
+server.csr
+server.key

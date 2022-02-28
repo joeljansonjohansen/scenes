@@ -28,6 +28,7 @@ export function grainPlayer(options) {
 		url: options.buffer,
 		volume: options.volume,
 		detune: options.detune,
+		reverse: options.reverse,
 		onstop: () => {
 			options.onstop();
 			source.dispose();
@@ -42,6 +43,7 @@ export function player(options) {
 		url: options.buffer,
 		volume: options.volume,
 		playbackRate: Tone.intervalToFrequencyRatio(options.detune / 100),
+		reverse: options.reverse,
 		onstop: () => {
 			options.onstop();
 			source.dispose();

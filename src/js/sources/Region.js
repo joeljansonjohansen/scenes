@@ -48,12 +48,18 @@ export default class OSRegion {
 		 * dispose the effects and the player in the onStop.
 		 */
 
+		let reverse = false;
+		if ((this.randomReversing && Math.random() > 0.5) || this.reverse) {
+			reverse = true;
+		}
+
 		let source = Source.getSource({
 			sourceType: this.sourceType,
 			buffer: this.buffer,
 			volume: this.volume,
 			detune: this.detune,
 			pitch: this.pitch,
+			reverse: reverse,
 			onstop: () => {
 				currentEffects.forEach((effect) => {
 					effect.dispose();
@@ -195,11 +201,11 @@ export default class OSRegion {
 	}
 
 	get buffer() {
-		if ((this.randomReversing && Math.random() > 0.5) || this.reverse) {
+		/* if ((this.randomReversing && Math.random() > 0.5) || this.reverse) {
 			return this._reversedBuffer;
-		} else {
-			return this._buffer;
-		}
+		} else { */
+		return this._buffer;
+		//}
 	}
 
 	set offset(val) {

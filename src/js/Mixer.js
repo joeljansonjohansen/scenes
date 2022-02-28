@@ -4,9 +4,11 @@ export default class Mixer {
 		this.input = new Tone.Channel();
 		this.output = new Tone.Channel().toDestination();
 		this.effects = [];
-		//this.setupLowPassFilter();
-		this.setupReverb();
+		//this.setupReverb();
+		//this.setupStereoWidener();
+		this.setupMeter();
 		this.setupLimiterGain();
+		//this.setupLowPassFilter();
 		this.setupLimiter();
 		this.input.chain(...this.effects, this.output);
 	}
@@ -21,6 +23,10 @@ export default class Mixer {
 		this.lpfilter.rolloff = rolloff;
 		this.effects.push(this.lpfilter);
 	}
+	setupMeter() {
+		this.meter = new Tone.Meter();
+		this.effects.push(this.meter);
+	}
 	setupLimiter() {
 		this.limiter = new Tone.Limiter(0);
 		this.effects.push(this.limiter);
@@ -29,4 +35,8 @@ export default class Mixer {
 		this.limiterGain = new Tone.Gain(5, "decibels");
 		this.effects.push(this.limiterGain);
 	}
+	/* setupStereoWidener() {
+		this.stereoWidener = new Tone.StereoWidener(0.9);
+		this.effects.push(this.stereoWidener);
+	} */
 }
