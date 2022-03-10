@@ -5,6 +5,10 @@ export default class RecorderModule extends Module {
 	constructor(options) {
 		super(options);
 
+		console.log(
+			"Recordermodule is deprecated, use OnsetRecorderModule instead"
+		);
+
 		this.pre = 0.5;
 		this.after = 0.5;
 		this.sliceOffset = 0.3;

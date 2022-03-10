@@ -1,5 +1,6 @@
 import PlayerModule from "../src/js/modules/PlayerModule.js";
 import RecorderModule from "../src/js/modules/RecorderModule.js";
+import OnsetRecorderModule from "../src/js/modules/OnsetRecorderModule.js";
 import GraphicModule from "../src/js/modules/GraphicModule.js";
 import Permissions from "../src/js/Permissions.js";
 import { backgroundColor, complementaryColor } from "./js/Globals.js";
@@ -14,6 +15,7 @@ import p5 from "p5";
 import * as Tone from "tone";
 import Mixer from "./js/Mixer.js";
 import { random } from "./js/sources/Source.js";
+import AMGrainPlayer from "./js/tone-extensions/AMGrainPlayer.js";
 
 let modules = [];
 let permissions = new Permissions("microphone", "gyroscope");
@@ -119,7 +121,27 @@ function getAllSupportedMimeTypes(...mediaTypes) {
 	].filter((variation) => MediaRecorder.isTypeSupported(variation));
 }
 
+let player;
+
 function draw() {
+	if (player) {
+		let loopStart = constrain(
+			map(mouseX, 0, 400, 0, player.buffer.duration),
+			0,
+			player.buffer.duration
+		);
+		if (reverse) {
+			//loopStart = map(loopStart,0,player.buffer.duration,player.buffer.duration,0);
+		}
+		//player.reverse = reverse;
+		//console.log(loopStart);
+		player.loopStart = loopStart;
+		player.loopEnd = constrain(loopStart + 0.02, 0, player.buffer.duration);
+		//console.log("player.loopStart: ", player.loopStart)
+		//console.log("player.loopEnd: ", player.loopEnd)
+		player.detune = map(mouseY, 0, 400, -1200, 1200);
+		//player.playbackRate = map(mouseY,0,400,0.01,2);
+	}
 	//console.log(mixer.limiter.red)
 
 	drawMainGui();
@@ -172,34 +194,39 @@ function setupModules() {
 	});
 	playerModule.channel.connect(mixer.input);
 	modules.push(playerModule); */
-
-	/* const recModule = new RecorderModule({
-		start: "1m",
-		length: "10m",
+	const recModule = new OnsetRecorderModule({
+		start: "4m",
+		length: "1m",
 		input: permissions.mic,
 		onEnd: () => {
-			console.log("sliced buffer is:", recModule.slicedBuffer);
-			createPlayer("12m", -2400, "20m", recModule.slicedBuffer);
-			createPlayer("12m", -300, "15m", recModule.slicedBuffer);
-			createPlayer("12m", -1200, "20m", recModule.slicedBuffer);
-			createPlayer("12m", -0, "20m", recModule.slicedBuffer);
+			let reverb = new Tone.Reverb(10.5).toDestination();
+			//let reverb = new Tone.AutoFilter("4n").toDestination().start();
+			reverb.wet.value = 0.6;
 
-			createPlayer("30m", -700, "10m", recModule.slicedBuffer);
-			createPlayer("25m", 400, "25m", recModule.slicedBuffer);
-			createPlayer("30m", -1200, "20m", recModule.slicedBuffer);
-			createPlayer("30m", 200, "20m", recModule.slicedBuffer);
+			/*player = new AMGrainPlayer({
+				url: recModule.originalBuffer,
+				frequency: 0.1,
+				grainSize: 0.5,
+				overlap: 0.01,
+				loop: true,
+			})
+				.connect(reverb)
+				.sync()
+				.start("6m");*/
 
-			createPlayer("40m", 700, "20m", recModule.slicedBuffer);
-			createPlayer("50m", 400, "20m", recModule.slicedBuffer);
-			createPlayer("50m", 1200, "20m", recModule.slicedBuffer);
-			createPlayer("50m", 0, "20m", recModule.slicedBuffer);
+			console.log("sliced buffer is:", recModule.originalBuffer);
+			let player = new Tone.Player({
+				url: recModule.originalBuffer,
+				loop: true,
+			})
+				.toDestination()
+				.sync()
+				.start("6m");
 		},
-	}); */
-
+	});
 	//createClusterTest();
 	//createAltissimoTest();
-
-	let gtm = new GraphicModule({
+	/* let gtm = new GraphicModule({
 		start: "0:0",
 		length: "2m",
 		title: "Long long long long long long title",
@@ -220,7 +247,7 @@ function setupModules() {
 			modules.splice(modules.indexOf(gtm2), 1);
 		},
 	});
-	modules.push(gtm2);
+	modules.push(gtm2); */
 	// let playerModule = new PlayerModule({
 	// 	start: "1:0",
 	// 	length: "5m",
