@@ -120,7 +120,7 @@ function setupModules() {
 		onEnd: () => {
 			for (let playerModule of playerModules) {
 				playerModule.prepareModule({
-					recordingURL: recorderModule.recordingURL,
+					buffer: recorderModule.recordingURL,
 					moduleReady: () => {
 						playerModule.connect(reverb);
 						console.log("Recorder module connected to other module");

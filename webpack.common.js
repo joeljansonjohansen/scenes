@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
 	entry: {
 		app: "./src/index.js",
-		test: "./src/test.js",
+		piano: "./src/piano.js",
 	},
 	output: {
 		filename: "[name].[fullhash].js",
@@ -16,8 +16,8 @@ module.exports = {
 		}),
 		new HtmlWebpackPlugin({
 			// Also generate a test.html
-			filename: "test.html",
-			template: "./test.html",
+			filename: "piano.html",
+			template: "./piano.html",
 			excludeChunks: ["app"],
 		}),
 	],

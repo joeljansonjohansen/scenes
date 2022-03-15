@@ -8,6 +8,9 @@ import { backgroundColor, complementaryColor } from "./js/Globals.js";
 import Syncronizer from "./js/Quasi-Sync.js";
 
 import wssax from "./assets/wssax.mp3";
+import ravel from "./assets/ravel.mp3";
+import dulc from "./assets/dulcimer.mp3";
+import saxc4 from "./assets/saxophone-c4.mp3";
 import font from "./assets/fonts/Forum-Regular.ttf";
 import lato from "./assets/fonts/Lato-Regular.ttf";
 
@@ -170,114 +173,31 @@ function draw() {
 }
 
 function setupModules() {
-	/* let playerModule = new PlayerModule({
-		start: "82m",
-		length: "200m",
-		interval: "random",
-		density: 0.3,
-		fadeIn: 0.001,
-		fadeOut: 0.001,
-		recordingCompensation: 0.4,
-		regions: {
-			length: "10m",
-			sourceType: "player",
-			offset: "random",
-			scattering: true,
-			randomDetune: true,
-			detune: 0,
-			//randomReversing: true,
+	console.log("buffers should load");
+	const pianoSamples = new Tone.ToneAudioBuffers(
+		{
+			0: dulc,
+			1: ravel,
+			2: saxc4,
 		},
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(playerModule), 1);
-		},
-	});
-	playerModule.channel.connect(mixer.input);
-	modules.push(playerModule); */
-	const recModule = new OnsetRecorderModule({
-		start: "4m",
-		length: "1m",
-		input: permissions.mic,
-		onEnd: () => {
-			let reverb = new Tone.Reverb(10.5).toDestination();
-			//let reverb = new Tone.AutoFilter("4n").toDestination().start();
-			reverb.wet.value = 0.6;
-
-			/*player = new AMGrainPlayer({
-				url: recModule.originalBuffer,
-				frequency: 0.1,
-				grainSize: 0.5,
-				overlap: 0.01,
-				loop: true,
-			})
-				.connect(reverb)
-				.sync()
-				.start("6m");*/
-
-			console.log("sliced buffer is:", recModule.originalBuffer);
-			let player = new Tone.Player({
-				url: recModule.originalBuffer,
-				loop: true,
-			})
-				.toDestination()
-				.sync()
-				.start("6m");
-		},
-	});
-	//createClusterTest();
-	//createAltissimoTest();
-	/* let gtm = new GraphicModule({
-		start: "0:0",
-		length: "2m",
-		title: "Long long long long long long title",
-		showsCircle: true,
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(gtm), 1);
-		},
-	});
-	modules.push(gtm);
-
-	let gtm2 = new GraphicModule({
-		start: "3:0",
-		length: "5m",
-		showsLine: true,
-		onEnd: () => {
-			console.log("module finished");
-			modules.splice(modules.indexOf(gtm2), 1);
-		},
-	});
-	modules.push(gtm2); */
-	// let playerModule = new PlayerModule({
-	// 	start: "1:0",
-	// 	length: "5m",
-	// 	interval: "random",
-	// 	fadeOut: 1.1,
-	// 	density: 0.3,
-	// 	decay: "3m",
-	// 	pitch: "C4",
-	// 	detune: -1200,
-	// 	// harmony: [
-	// 	// 	[-2400, -3600, -1200, -500, -300, 0],
-	// 	// 	[-2000, -3200, -800, -100, 100, 400],
-	// 	// ],
-	// 	// harmony: [[-1200], [-1600], [-1200], [-500], [-300]],
-	// 	recordingURL: "../assets/dulcimer.mp3",
-	// 	// recordingURL: "../assets/saxophone-c4.mp3",
-	// 	// recordingURL: "../assets/ravel.mp3",
-	// 	regions: {
-	// 		length: "8n",
-	// 		scattering: true,
-	// 		sourceType: "noise",
-	// 		totalRandomization: true,
-	// 	},
-	// 	onEnd: () => {
-	// 		console.log("module finished");
-	// 		modules.splice(modules.indexOf(playerModule), 1);
-	// 	},
-	// });
-	// playerModule.channel.connect(reverb);
-	// modules.push(playerModule);
+		() => {
+			console.log("buffers are loaded");
+			let newPlayerModule = new PlayerModule({
+				start: "2:0",
+				length: "25m",
+				interval: "random",
+				density: 1.3,
+				buffer: dulc,
+				onEnd: () => {
+					console.log("module finished");
+					modules.splice(modules.indexOf(playerModule), 1);
+				},
+			});
+			console.log("playermodule", newPlayerModule);
+			newPlayerModule.channel.connect(mixer.input);
+			modules.push(newPlayerModule);
+		}
+	);
 }
 
 function createPlayer(start = "1m", detune, length = "50m", slicedBuffer) {

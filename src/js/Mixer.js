@@ -4,7 +4,7 @@ export default class Mixer {
 		this.input = new Tone.Channel();
 		this.output = new Tone.Channel().toDestination();
 		this.effects = [];
-		//this.setupReverb();
+		this.setupReverb();
 		//this.setupStereoWidener();
 		this.setupMeter();
 		this.setupLimiterGain();

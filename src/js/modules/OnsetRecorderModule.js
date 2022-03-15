@@ -78,7 +78,8 @@ export default class OnsetRecorderModule extends Module {
 					);
 					//console.log("newbuffer: ", newBuffer);
 					//newBuffer.normalizeBuffer();
-					this.originalBuffer = this.normalize(newBuffer);
+					this.originalBuffer = newBuffer;
+					this.normalizedBuffer = this.normalize(newBuffer);
 					//console.log("Recording ended");
 					super.stopModule();
 				},

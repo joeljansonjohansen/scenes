@@ -13,7 +13,6 @@ export default class AudioModule extends Module {
 		 * The channel connected to the module.
 		 */
 		this.channel = new Tone.Volume();
-
 		/*
 		 * This is the envelope for the entire module.
 		 * The envelope is used to be able to have a separate volume control.
